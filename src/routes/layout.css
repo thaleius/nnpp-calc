@@ -1,0 +1,12 @@
+@import url("/static/fonts/fonts.css");
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+.monospace {
+  font-family: "Courier New", monospace;
+}
+
+:global(*:focus) {
+  outline: none;
+}
