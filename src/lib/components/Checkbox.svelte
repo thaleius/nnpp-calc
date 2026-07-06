@@ -8,7 +8,7 @@
   <label class="flex items-center gap-2 cursor-pointer select-none">
   <input type="checkbox" class="sr-only peer" bind:checked={checked} onchange={onchange} />
   
-  <div class="w-5 h-5 border-2 rounded transition-colors
+  <div class="min-w-5 min-h-5 border-2 rounded transition-colors
     border-orange-300 
     peer-checked:bg-orange-300 
     flex items-center justify-center">
