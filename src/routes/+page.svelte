@@ -4,7 +4,7 @@
   import TurbineUtil from "$lib/components/TurbineUtil.svelte";
   import { FR, FR_power, FRV, output, T } from "$lib/functions";
 
-  let temp = $state(323.0);
+  let temp = $state(425.0);
 
   let flowRate1 = $state(0.00);
   let flowRate2 = $state(0.00);
@@ -163,6 +163,10 @@
 
     if (temp < 323) {
       currentNotes.push("Temperatures lower than 323 K cannot be achieved.");
+    }
+
+    if (temp <= 370) {
+      currentNotes.push("Keep in mind that the temperature must be higher than 370 K for flow to occur.");
     }
 
     if (excess > 50000) {
