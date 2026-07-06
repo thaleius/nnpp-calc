@@ -1,5 +1,17 @@
 <script lang="ts">
   let { name, value = $bindable(), edit = $bindable(), decimals, unit, wrapperClass, inputClass, compact }: { name: string, value: number, edit: boolean, decimals: number, unit: string, wrapperClass?: string, inputClass?: string, compact?: boolean } = $props();
+
+  function sanitizeInput(input: string) {
+    
+    let sanitized = input.replace(/[^0-9.]/g, '');
+    
+    const parts = sanitized.split('.');
+    if (parts.length > 2) {
+      sanitized = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    return sanitized;
+  }
 </script>
 
 <div class="
@@ -16,7 +28,9 @@
   {/if}
   <div>
     <input type="text" class="text-xl bg-transparent border-0 text-right p-0 {inputClass}" value={value.toFixed(decimals)} oninput={(e) => {
-      value = Number((e.target as HTMLInputElement).value)
+      const input = sanitizeInput((e.target as HTMLInputElement).value);
+      (e.target as HTMLInputElement).value = input;
+      value = Number(input);
     }} readonly={!edit} />
     <span>{unit}</span>
   </div>
