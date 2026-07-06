@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ChangeEventHandler } from "svelte/elements";
 
-  let { text, checked = $bindable(), onchange }: { text: string, checked?: boolean, onchange: ChangeEventHandler<HTMLInputElement> } = $props();
+  let { text, checked = $bindable(), onchange, labelClass }: { text: string, checked?: boolean, onchange?: ChangeEventHandler<HTMLInputElement>, labelClass?: string } = $props();
 </script>
 
 <label>
@@ -17,6 +17,6 @@
       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
     </svg> -->
   </div>
-  <span>{text}</span>
+  <span class={labelClass}>{text}</span>
 </label>
 </label>

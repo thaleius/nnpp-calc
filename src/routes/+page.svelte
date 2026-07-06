@@ -14,8 +14,10 @@
 
   let powerOutput1 = $derived(output(flowRate1));
   let powerOutput2 = $derived(output(flowRate2));
+
+  let turbsToPrimary = $state(false);
   
-  let excess = $derived(powerOutput1 + powerOutput2);
+  let excess = $derived(powerOutput1 + powerOutput2 - (turbsToPrimary ? 30000 : 0));
 
   const Temp = 1;
   const Excess = 2;
@@ -116,14 +118,22 @@
       </div>
     </div>
   </div>
-  <div class="flex flex-col gap-y-4 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg monospace p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
-    <div class="title">Edit</div>
-    <div class="flex flex-col gap-y-2">
-      <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => updateSelection('tempEdit', e.currentTarget.checked)} />
-      <!-- <Checkbox text="Excess" bind:checked={checked.excEdit} onchange={(e) => updateSelection('excEdit', e.currentTarget.checked)} /> -->
-      <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => updateSelection('frvEdit', e.currentTarget.checked)} />
-      <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => updateSelection('frEdit', e.currentTarget.checked)} />
-      <!-- <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => updateSelection('outEdit', e.currentTarget.checked)} /> -->
+  <div class="flex flex-col gap-y-4">
+    <div class="flex flex-col gap-y-4 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg monospace p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+      <div class="flex flex-col gap-y-2">
+        <Checkbox text="Turbines powering Primary grid?" labelClass="w-42" bind:checked={turbsToPrimary} />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-y-4 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg monospace p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+      <div class="title">Edit</div>
+      <div class="flex flex-col gap-y-2">
+        <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => updateSelection('tempEdit', e.currentTarget.checked)} />
+        <!-- <Checkbox text="Excess" bind:checked={checked.excEdit} onchange={(e) => updateSelection('excEdit', e.currentTarget.checked)} /> -->
+        <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => updateSelection('frvEdit', e.currentTarget.checked)} />
+        <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => updateSelection('frEdit', e.currentTarget.checked)} />
+        <!-- <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => updateSelection('outEdit', e.currentTarget.checked)} /> -->
+      </div>
     </div>
   </div>
 </div>
