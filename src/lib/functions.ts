@@ -1,5 +1,6 @@
-const C1 = 391.213071072183;
-const C2 = 5.31730933886138;
+import { getConstants } from "./api";
+
+const [C1, C2] = await getConstants();
 const T0 = 323;
 const T1 = 370;
 
