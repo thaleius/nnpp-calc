@@ -1,8 +1,21 @@
 <script lang="ts">
   let { name, value = $bindable(), edit = $bindable(), decimals, unit, wrapperClass, inputClass, compact }: { name: string, value: number, edit: boolean, decimals: number, unit: string, wrapperClass?: string, inputClass?: string, compact?: boolean } = $props();
 
+  // svelte-ignore state_referenced_locally
+  let displayValue = $state(value !== undefined && value !== null ? value.toFixed(decimals) : '');
+  let isInternalUpdate = false;
+
+  $effect(() => {
+    if (value !== undefined && value !== null) {
+      if (isInternalUpdate) {
+        isInternalUpdate = false;
+      } else {
+        displayValue = value.toFixed(decimals);
+      }
+    }
+  });
+
   function sanitizeInput(input: string) {
-    
     let sanitized = input.replace(/[^0-9.]/g, '');
     
     const parts = sanitized.split('.');
@@ -27,10 +40,11 @@
     <span>{name}: </span>
   {/if}
   <div>
-    <input type="text" class="text-xl bg-transparent border-0 text-right p-0 {inputClass}" value={value} oninput={(e) => {
+    <input type="text" class="text-xl bg-transparent border-0 text-right p-0 {inputClass}" value={displayValue} oninput={(e) => {
       const input = sanitizeInput((e.target as HTMLInputElement).value);
-      (e.target as HTMLInputElement).value = input;
-      value = Number(input);
+      displayValue = input;
+      isInternalUpdate = true;
+      value = input === '' ? 0 : Number(input);
     }} readonly={!edit} />
     <span>{unit}</span>
   </div>
