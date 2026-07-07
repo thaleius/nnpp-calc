@@ -1,6 +1,6 @@
 import { getConstants } from "./api";
 
-const [[C1, dC1], [C2, dC2]] = await getConstants();
+const { C1, dC1, C2, dC2 } = await getConstants();
 const T0 = 323;
 const T1 = 370;
 const T2 = 423;
