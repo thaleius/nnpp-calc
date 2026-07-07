@@ -1,6 +1,6 @@
 import { getConstants } from "./api";
 
-const [C1, C2] = await getConstants();
+const [[C1, dC1], [C2, dC2]] = await getConstants();
 const T0 = 323;
 const T1 = 370;
 const T2 = 423;
@@ -20,6 +20,10 @@ export function T(FRV: number, FR: number) {
 
 export function pressure(T: number) {
   return (T > T1 ? T > T2 ? (C1 * (T-T0)) : (C1*C2 * (T-T1)**2) : 0) + P0;
+}
+
+export function pressure_unc(T: number) {
+  return T > T1 ? T > T2 ? ((T-T0)*dC1) : ((T-370)**2*((C2*dC1)**2 + (C1*dC2)**2)**(1/2)) : 0
 }
 
 export function power(FR: number) {

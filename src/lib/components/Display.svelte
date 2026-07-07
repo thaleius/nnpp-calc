@@ -5,6 +5,7 @@
     edit = $bindable(),
     decimals,
     unit,
+    pre,
     wrapperClass,
     inputClass,
     compact,
@@ -15,6 +16,7 @@
     edit?: boolean,
     decimals: number,
     unit: string,
+    pre?: string,
     wrapperClass?: string,
     inputClass?: string,
     compact?: boolean,
@@ -60,7 +62,7 @@
     <span>{name}: </span>
   {/if}
   <div>
-    <input type="text" class="text-xl bg-transparent border-0 text-right p-0 {inputClass}" value={displayValue} oninput={(e) => {
+      <span>{pre}</span><input type="text" class="text-xl bg-transparent border-0 text-right p-0 {inputClass}" value={displayValue} oninput={(e) => {
       onEdit();
       const input = sanitizeInput((e.target as HTMLInputElement).value);
       displayValue = input;

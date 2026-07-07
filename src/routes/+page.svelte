@@ -2,10 +2,11 @@
   import Checkbox from "$lib/components/Checkbox.svelte";
   import Display from "$lib/components/Display.svelte";
   import TurbineUtil from "$lib/components/TurbineUtil.svelte";
-  import { FR, FR_power, FRV, power, pressure, T } from "$lib/functions";
+  import { FR, FR_power, FRV, power, pressure, pressure_unc, T } from "$lib/functions";
 
   let temp = $state(423.0);
   let pres = $derived(pressure(temp));
+  let pres_unc = $derived(pressure_unc(temp));
 
   let flowRate1 = $state(0.00);
   let flowRate2 = $state(0.00);
@@ -238,7 +239,10 @@
   <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg monospace p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
     <div class="flex flex-col gap-y-1">
       <Display name="Temperature" bind:value={temp} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" compact />
-      <Display name="Pressure" bind:value={pres} decimals={1} unit="kPa" inputClass="w-24" compact />
+      <div class="flex flex-row gap-x-1">
+        <Display name="Pressure" bind:value={pres} decimals={1} unit="kPa" inputClass="w-24" wrapperClass="w-full" compact />
+        <Display name="Uncertainty" bind:value={pres_unc} decimals={1} unit="kPa" pre="&#177;" inputClass="w-12" wrapperClass="w-full" compact />
+      </div>
       <Display name="Excess" bind:value={excess} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact />
     </div>
     <div class="flex gap-x-2 [&>div]:w-1/2">
