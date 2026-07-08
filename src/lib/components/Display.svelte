@@ -2,6 +2,7 @@
   let {
     name,
     value = $bindable(),
+    uncertainty,
     edit = $bindable(),
     decimals,
     unit,
@@ -13,6 +14,7 @@
   }: {
     name: string,
     value: number,
+    uncertainty?: number,
     edit?: boolean,
     decimals: number,
     unit: string,
@@ -71,4 +73,5 @@
     }} readonly={!edit} />
     <span>{unit}</span>
   </div>
+  <span class="text-xs text-gray-500">&#177;&#8239;{(uncertainty || 0).toFixed(decimals)}&#8239;{unit}</span>
 </div>
