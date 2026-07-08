@@ -108,8 +108,8 @@
         flowRateValve2.uncertainty = frv_unc;
         powerOutput1.value = power(fr);
         powerOutput2.value = power(fr);
-        powerOutput1.uncertainty = power_unc(fr_unc, false);
-        powerOutput2.uncertainty = power_unc(fr_unc, false);
+        powerOutput1.uncertainty = power_unc(fr_unc);
+        powerOutput2.uncertainty = power_unc(fr_unc);
       } else {
         let fr1, fr2;
         let fr1_unc = 0, fr2_unc = 0;
@@ -149,9 +149,8 @@
         powerOutput1.value = po1;
         powerOutput2.value = po2;
 
-        const single = !(po1 && po2);
-        powerOutput1.uncertainty = power_unc(fr1_unc, single);
-        powerOutput2.uncertainty = power_unc(fr2_unc, single);
+        powerOutput1.uncertainty = power_unc(fr1_unc);
+        powerOutput2.uncertainty = power_unc(fr2_unc);
       }
     } else {
       if (checked.frvEdit && checked.excEdit) {
@@ -182,7 +181,6 @@
         let temp_unc = T_unc(frv, 0, fr, 0);
         let po1 = power(fr1);
         let po2 = power(fr2);
-        const single = !(po1 && po2);
 
         currentNotes.push("This combination yields accurate results only if the resulting temperature is above 423&nbsp;K.");
         if (newTemp < 423) {
@@ -195,13 +193,18 @@
 
         flowRate1.value = fr1;
         flowRate2.value = fr2;
-        flowRate1.uncertainty = FR_unc(newTemp, temp_unc, frv1, 0);
-        flowRate2.uncertainty = FR_unc(newTemp, temp_unc, frv2, 0);
+
+        const
+          fr1_unc = fr1 == 0 ? 0 : FR_unc(newTemp, temp_unc, frv1, 0),
+          fr2_unc = fr2 == 0 ? 0 : FR_unc(newTemp, temp_unc, frv2, 0);
+
+        flowRate1.uncertainty = fr1_unc;
+        flowRate2.uncertainty = fr2_unc;
         
         powerOutput1.value = po1;
         powerOutput2.value = po2;
-        powerOutput1.uncertainty = power_unc(fr1, single);
-        powerOutput2.uncertainty = power_unc(fr2, single);
+        powerOutput1.uncertainty = po1 == 0 ? 0 : power_unc(fr1_unc);
+        powerOutput2.uncertainty = po2 == 0 ? 0 : power_unc(fr2_unc);
       } else if (checked.tempEdit && checked.outEdit) {
         powerOutput1.uncertainty = 0;
         powerOutput2.uncertainty = 0;

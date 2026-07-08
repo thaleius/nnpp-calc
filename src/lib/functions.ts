@@ -53,8 +53,8 @@ export function power(FR: number) {
   return FR > 3.61 ? C3 * (FR-3.61) : 0;
 }
 
-export function power_unc(dFR: number, single: boolean = true): number {
-  return single ? C3*dFR : 2**(1/2)*power_unc(dFR);
+export function power_unc(dFR: number) {
+  return C3*dFR;
 }
 
 export function FR_power(power: number) {
