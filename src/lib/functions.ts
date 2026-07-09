@@ -1,6 +1,6 @@
 import { getConstants } from "./api";
 
-const { C1, dC1, C2, dC2, C3, dC3, C4, dC4 } = await getConstants();
+const { C1, dC1, C2, dC2, C3, dC3, C4, dC4, C5, dC5 } = await getConstants();
 const T0 = 323;
 const T1 = 370;
 const T2 = 423;
@@ -98,4 +98,24 @@ export function T_fwFlow_unc(fwFlow: number) {
   return fwFlow < 0 ? 0 : fwFlow > fw_flow(fwPlateau) ? 0 : (
     (dC4*fwFlow)**2
   )**(1/2) * k;
+}
+
+export function fw_util(fwFlow: number, single: boolean = false): number {
+  return single ? 2*fw_util(fwFlow) : C5*fwFlow;
+}
+
+export function fw_util_unc(fwFlow: number, dfwFlow: number, single: boolean = false): number {
+  return single ? 2*fw_util_unc(fwFlow, dfwFlow) : (
+    (dC5*fwFlow)**2 + (C5*dfwFlow)**2
+  )**(1/2) * k;
+}
+
+export function fw_flow_util(fwUtil: number, single: boolean = false): number {
+  return single ? fw_flow_util(fwUtil)/2 : fwUtil/C5;
+}
+
+export function fw_flow_util_unc(fwUtil: number, dfwUtil: number, single: boolean = false):number {
+  return single ? fw_flow_util_unc(fwUtil, dfwUtil)/2 : (
+    (dfwUtil/C5)**2 + (fwUtil/C5**2 * dC5)**2
+  )**(1/2) * k
 }

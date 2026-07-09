@@ -3,7 +3,7 @@
   import Checkbox from "$lib/components/Checkbox.svelte";
   import Display from "$lib/components/Display.svelte";
   import TurbineUtil from "$lib/components/TurbineUtil.svelte";
-  import { dExc, dFR, dFRV, dT, excess_unc, FR, FR_power, FR_power_unc, FR_unc, FRV, FRV_unc, fw_flow, fw_flow_unc, power, power_unc, pressure, pressure_unc, T, T_fwFlow, T_fwFlow_unc, T_unc } from "$lib/functions";
+  import { dExc, dFR, dFRV, dT, excess_unc, FR, FR_power, FR_power_unc, FR_unc, FRV, FRV_unc, fw_flow, fw_flow_unc, fw_flow_util, fw_flow_util_unc, fw_util, fw_util_unc, power, power_unc, pressure, pressure_unc, T, T_fwFlow, T_fwFlow_unc, T_unc } from "$lib/functions";
   import { page } from '$app/state';
   import { Clipboard } from "flowbite-svelte";
   import { goto } from '$app/navigation';
@@ -43,6 +43,7 @@
   });
 
   let turbsToPrimary = $state(false);
+  let singleFWpump = $state(false);
   
   let excess = $state({
     value: 0,
@@ -53,6 +54,10 @@
     value: fw_flow(temp.value),
     uncertainty: fw_flow_unc(temp.value, temp.uncertainty)
   })
+  let feedwater_util = $state({
+    value: fw_util(feedwater_flow.value),
+    uncertainty: fw_util_unc(feedwater_flow.value, feedwater_flow.uncertainty)
+  })
 
   let notes: string[] = $state([]);
 
@@ -62,17 +67,18 @@
   const FlowRate = 4;
   const Output = 5;
   const FWFlow = 6;
+  const FWUtil = 7;
 
   const combinations = [
-    [1, 3],   // temp & flow rate valve
-    [1, 4],   // temp & flow rate
+    [1, 3],    // temp & flow rate valve
+    [1, 4],    // temp & flow rate
 
-    [1, 5],   // temp & power output
+    [1, 5],    // temp & power output
 
-    [2, 3],   // excess & frv
+    [2, 3],    // excess & frv
 
-    [1, 2],   // temp & excess
-    [1, 2, 3] // temp & excess & frv
+    [1, 2],    // temp & excess
+    [1, 2, 3], // temp & excess & frv
   ];
 
   let checked: Record<string, boolean> = $state({
@@ -81,7 +87,8 @@
     frEdit: false,
     frvEdit: false,
     outEdit: false,
-    fwFlowEdit: false
+    fwFlowEdit: false,
+    fwUtilEdit: false
   });
 
   let lastEdited: 0|1|2 = 0;
@@ -99,9 +106,25 @@
     if (checked.fwFlowEdit && !checked.tempEdit) {
       temp.value = T_fwFlow(feedwater_flow.value);
       temp.uncertainty = T_fwFlow_unc(feedwater_flow.value);
+
+      feedwater_util.value = fw_util(feedwater_flow.value, singleFWpump);
+      feedwater_util.uncertainty = fw_util_unc(feedwater_flow.value, feedwater_flow.uncertainty, singleFWpump);
+    } else if (checked.fwUtilEdit && !checked.tempEdit) {
+      const
+        fwFlow = fw_flow_util(feedwater_util.value, singleFWpump),
+        fwFlow_unc = fw_flow_util_unc(feedwater_util.value, feedwater_util.uncertainty, singleFWpump);
+
+      feedwater_flow.value = fwFlow;
+      feedwater_flow.uncertainty = fwFlow_unc;
+
+      temp.value = T_fwFlow(fwFlow);
+      temp.uncertainty = T_fwFlow_unc(fwFlow);
     } else {
       feedwater_flow.value = fw_flow(temp.value);
       feedwater_flow.uncertainty = fw_flow_unc(temp.value, temp.uncertainty);
+
+      feedwater_util.value = fw_util(feedwater_flow.value, singleFWpump);
+      feedwater_util.uncertainty = fw_util_unc(feedwater_flow.value, feedwater_flow.uncertainty, singleFWpump);
     }
     if (checked.tempEdit && checked.excEdit) {
       excess.uncertainty = 0;
@@ -323,7 +346,8 @@
     frEdit: FlowRate,
     frvEdit: FlowRateValve,
     outEdit: Output,
-    fwFlowEdit: FWFlow
+    fwFlowEdit: FWFlow,
+    fwUtilEdit: FWUtil
   };
 
   function updateSelection(changedKey: keyof typeof checked, newValue: boolean) {
@@ -400,6 +424,8 @@
             turbsToPrimary = json.t2p;
           if (json.fwFlow)
             feedwater_flow.value = json.fwFlow;
+          if (json.fwUtil)
+            feedwater_util.value = json.fwUtil;
 
           if (json.checked) {
             checked.tempEdit = !!json.checked.tempEdit;
@@ -408,6 +434,7 @@
             checked.frvEdit = !!json.checked.frvEdit;
             checked.outEdit = !!json.checked.outEdit;
             checked.fwFlowEdit = !!json.checked.fwFlowEdit;
+            checked.fwUtilEdit = !!json.checked.fwUtilEdit;
             
             if (json.checked.tempEdit) {
               temp.uncertainty = 0;
@@ -430,6 +457,9 @@
             if (json.checked.fwFlowEdit) {
               feedwater_flow.uncertainty = 0;
             }
+            if (json.checked.fwUtilEdit) {
+              feedwater_util.uncertainty = 0;
+            }
           }
         }
       } catch (error) {
@@ -445,7 +475,8 @@
       frEdit: checked.frEdit ? true : undefined,
       frvEdit: checked.frvEdit ? true : undefined,
       outEdit: checked.outEdit ? true : undefined,
-      fwFlowEdit: checked.fwFlowEdit ? true : undefined
+      fwFlowEdit: checked.fwFlowEdit ? true : undefined,
+      fwUtilEdit: checked.fwUtilEdit ? true : undefined
     };
     const json = {
       temp: temp.value === 423 ? undefined : temp.value,
@@ -458,6 +489,7 @@
       po2: powerOutput2.value === 0 ? undefined : powerOutput2.value,
       t2p: turbsToPrimary ? true : undefined,
       fwFlow: feedwater_flow.value === fw_flow(423) ? undefined : feedwater_flow.value,
+      fwUtil: feedwater_util.value === fw_util(423) ? undefined : feedwater_util.value,
       checked: Object.values(c).some((e) => e) ? c : undefined,
     };
 
@@ -487,7 +519,10 @@
         <!-- <Display name="Uncertainty" bind:value={pres_unc} decimals={1} unit="kPa" pre="&#177;" inputClass="w-12" wrapperClass="w-full" compact /> -->
       </div>
       <Display name="Excess" bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact />
-      <Display name="Minimum Feedwater Flow" bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" compact />
+      <div class="flex flex-row gap-x-1">
+        <Display name="Feedwater Flow" bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact />
+        <Display name="Utilization" bind:value={feedwater_util.value} uncertainty={feedwater_util.uncertainty} bind:edit={checked.fwUtilEdit} decimals={1} unit="%" inputClass="w-16" wrapperClass="w-full" compact />
+      </div>
     </div>
     <div class="flex gap-x-2 [&>div]:w-1/2">
       <div>
@@ -503,7 +538,8 @@
   <div class="flex flex-col gap-y-4 w-64 max-h-screen overflow-y-auto">
     <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
       <div class="flex flex-col gap-y-2">
-        <Checkbox text="Turbines powering Primary grid?" labelClass="" bind:checked={turbsToPrimary} />
+        <Checkbox text="Turbines powering Primary grid?" labelClass="leading-none" bind:checked={turbsToPrimary} />
+        <Checkbox text="One feedwater pump unavailable?" labelClass="leading-none" bind:checked={singleFWpump} />
       </div>
     </div>
 
@@ -513,6 +549,7 @@
         <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => updateSelection('tempEdit', e.currentTarget.checked)} />
         <Checkbox text="Excess" bind:checked={checked.excEdit} onchange={(e) => updateSelection('excEdit', e.currentTarget.checked)} />
         <Checkbox text="Feedwater Flow" bind:checked={checked.fwFlowEdit} onchange={(e) => updateSelection('fwFlowEdit', e.currentTarget.checked)} />
+        <Checkbox text="Feedwater Util" bind:checked={checked.fwUtilEdit} onchange={(e) => updateSelection('fwUtilEdit', e.currentTarget.checked)} />
         <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => updateSelection('frvEdit', e.currentTarget.checked)} />
         <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => updateSelection('frEdit', e.currentTarget.checked)} />
         <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => updateSelection('outEdit', e.currentTarget.checked)} />

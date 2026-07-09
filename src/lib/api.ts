@@ -16,8 +16,10 @@ export const getConstants = async () => {
   const dC2 = worksheet['C19'] ? worksheet['C19'].v : 0.000147356683340934;
   const C3 = worksheet['B20'] ? worksheet['B20'].v : 5499;
   const dC3 = worksheet['C20'] ? worksheet['C20'].v : 0;
-  const C4 = worksheet['B21'] ? worksheet['B21'].v : 5495.47778948;
-  const dC4 = worksheet['C21'] ? worksheet['C21'].v : 1.06545163;
+  const C4 = worksheet['B21'] ? worksheet['B21'].v : 1519.10957783;
+  const dC4 = worksheet['C21'] ? worksheet['C21'].v : 24.5949707;
+  const C5 = worksheet['B22'] ? worksheet['B22'].v : 2816.98830942;
+  const dC5 = worksheet['C22'] ? worksheet['C22'].v : 11.75458032;
 
   return {
     C1,
@@ -27,6 +29,8 @@ export const getConstants = async () => {
     C3,
     dC3,
     C4,
-    dC4
+    dC4,
+    C5,
+    dC5
   };
 };
