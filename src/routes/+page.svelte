@@ -492,8 +492,8 @@
       po1: powerOutput1.value === 0 ? undefined : powerOutput1.value,
       po2: powerOutput2.value === 0 ? undefined : powerOutput2.value,
       t2p: turbsToPrimary ? true : undefined,
-      fwFlow: feedwater_flow.value === fw_flow(423) ? undefined : feedwater_flow.value,
-      fwUtil: feedwater_util.value === fw_util(fw_flow(423)) ? undefined : feedwater_util.value,
+      fwFlow: temp.value === 423 ? undefined : feedwater_flow.value,
+      fwUtil: temp.value === 423 ? undefined : feedwater_util.value,
       checked: Object.values(c).some((e) => e) ? c : undefined,
       sFW: singleFWpump ? true : undefined,
     };
