@@ -23,7 +23,7 @@ export default defineConfig({
 				strict: true
 			}),
 			paths: {
-				base: process.argv.includes('dev') ? '' : '/turb-calc'
+				base: process.argv.includes('dev') ? '' : '/nnpp-calc'
 			}
 		})
 	]
