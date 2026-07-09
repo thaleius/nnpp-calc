@@ -581,7 +581,7 @@
 </script>
 
 <div class="flex flex-row gap-x-4 justify-center items-center w-screen h-screen font-mono">
-  <div class="flex flex-col gap-y-2 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
+  <div class="flex flex-col gap-y-2 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
     <div class="title">Calculation Presets</div>
     <div class="grid grid-cols-2 gap-3 font-mono text-sm">
       <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 1 ? activeClass : inactiveClass}`} onclick={() => preset == 1 ? preset = -1 : preset = 1}>
@@ -606,7 +606,7 @@
     </div>
   </div>
 
-  <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
+  <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
     <div class="flex flex-col gap-y-1">
       <div class="flex flex-row gap-x-1">
         <Display name="Temperature" bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
@@ -631,7 +631,7 @@
     </div>
   </div>
   <div class="flex flex-col gap-y-4 w-66 max-h-screen overflow-y-auto">
-    <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+    <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
       <div class="flex flex-col gap-y-2">
         <Checkbox text="Turbines powering Primary grid?" labelClass="leading-none" bind:checked={turbsToPrimary} onchange={() => handleModify() } />
         <Checkbox text="One feedwater pump unavailable?" labelClass="leading-none" bind:checked={singleFWpump} onchange={() => handleModify() }  />
@@ -647,7 +647,7 @@
         <Checkbox text="Feedwater Util." bind:checked={checked.fwUtilEdit} onchange={(e) => { handleModify(); updateSelection('fwUtilEdit', e.currentTarget.checked) }} />
         <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => { handleModify(); updateSelection('frvEdit', e.currentTarget.checked) }} />
         <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => { handleModify(); updateSelection('frEdit', e.currentTarget.checked) }} />
-        <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => updateSelection('outEdit', e.currentTarget.checked)} />
+        <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => { handleModify(); updateSelection('outEdit', e.currentTarget.checked) }} />
       </div>
     </div>
 
@@ -656,7 +656,7 @@
     </Clipboard>
 
     {#if notes.length > 0}
-      <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-6 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+      <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
         <div class="title">Notes</div>
         <div class="flex flex-col gap-y-1">
           {#each notes as note}
