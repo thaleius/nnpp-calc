@@ -40,7 +40,7 @@
   });
 
   function sanitizeInput(input: string) {
-    let sanitized = input.replace(/[^0-9.]/g, '');
+    let sanitized = input.replace(/,/g, '.').replace(/[^0-9.]/g, '');
     
     const parts = sanitized.split('.');
     if (parts.length > 2) {
