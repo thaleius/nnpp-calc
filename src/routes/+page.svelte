@@ -321,6 +321,10 @@
       }
     }
 
+    if (feedwater_util.value >= 79.95) {
+      currentNotes.push(`Feedwater pump${singleFWpump ? "" : "s"} will cavitate.`);
+    }
+
     if (temp.value > 20000) {
       currentNotes.push("Temperatures higher than 20000 K cannot be achieved.");
     }
