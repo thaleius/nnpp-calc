@@ -588,8 +588,8 @@
   }
 </script>
 
-<div class="flex flex-row flex-wrap gap-4 justify-center items-center w-screen min-h-screen py-4">
-  <div class="flex flex-col gap-y-2 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
+<div class="flex flex-row flex-wrap gap-4 justify-center items-center max-w-screen max-h-screen">
+  <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box column">
     <div class="title">Calculation Presets</div>
     <div class="grid grid-cols-2 gap-3 text-sm">
       <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 1 ? activeClass : inactiveClass}`} onclick={() => preset == 1 ? preset = -1 : preset = 1}>
@@ -614,7 +614,7 @@
     </div>
   </div>
 
-  <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
+  <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] box column">
     <div class="flex flex-col gap-y-1">
       <div class="flex flex-row gap-x-1">
         <Display name="Temperature" bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
@@ -638,15 +638,15 @@
       </div>
     </div>
   </div>
-  <div class="flex flex-col gap-y-4 w-66 max-h-screen overflow-y-auto">
-    <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+  <div class="flex flex-col gap-y-4 w-66 column">
+    <div class="flex flex-col bg-[#1e1e1e] box">
       <div class="flex flex-col gap-y-2">
         <Checkbox text="Turbines powering Primary grid?" labelClass="leading-none" bind:checked={turbsToPrimary} onchange={() => handleModify() } />
         <Checkbox text="One feedwater pump unavailable?" labelClass="leading-none" bind:checked={singleFWpump} onchange={() => handleModify() }  />
       </div>
     </div>
 
-    <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+    <div class="flex flex-col bg-[#1e1e1e] box">
       <div class="title">Edit</div>
       <div class="flex flex-col gap-y-4 leading-none">
         <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => { handleModify(); updateSelection('tempEdit', e.currentTarget.checked); }} />
@@ -663,8 +663,8 @@
       {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
     </Clipboard>
 
-    {#if notes.length > 0}
-      <div class="flex flex-col bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)]">
+    {#if (notes.length > 0 || notesPre.length > 0)}
+      <div class="flex flex-col bg-[#1e1e1e] box">
         <div class="title">Notes</div>
         <div class="flex flex-col gap-y-1">
           {#each notesPre as note}
@@ -687,5 +687,13 @@
     @apply mb-2;
     @apply text-orange-300;
     @apply uppercase;
+  }
+
+  .box {
+    @apply border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)];
+  }
+
+  .column {
+    @apply max-h-screen overflow-y-auto;
   }
 </style>
