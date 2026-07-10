@@ -13,6 +13,10 @@
   }
 }
 
+html {
+  font-family: "Courier New", monospace;
+}
+
 :global(*:focus) {
   outline: none;
 }

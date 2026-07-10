@@ -580,10 +580,10 @@
   }
 </script>
 
-<div class="flex flex-row gap-x-4 justify-center items-center w-screen h-screen font-mono">
+<div class="flex flex-row gap-x-4 justify-center items-center w-screen h-screen">
   <div class="flex flex-col gap-y-2 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
     <div class="title">Calculation Presets</div>
-    <div class="grid grid-cols-2 gap-3 font-mono text-sm">
+    <div class="grid grid-cols-2 gap-3 text-sm">
       <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 1 ? activeClass : inactiveClass}`} onclick={() => preset == 1 ? preset = -1 : preset = 1}>
         <span class="text-xs uppercase opacity-75">Preset 01</span>
         <span class="font-bold mt-1">Standard</span>
