@@ -580,7 +580,7 @@
   }
 </script>
 
-<div class="flex flex-row flex-wrap gap-4 justify-center items-center w-screen h-screen py-4">
+<div class="flex flex-row flex-wrap gap-4 justify-center items-center w-screen min-h-screen py-4">
   <div class="flex flex-col gap-y-2 bg-[#1e1e1e] border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)] max-h-screen overflow-y-auto">
     <div class="title">Calculation Presets</div>
     <div class="grid grid-cols-2 gap-3 text-sm">
