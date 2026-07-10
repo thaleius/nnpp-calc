@@ -81,6 +81,9 @@
 
     [1, 2],    // temp & excess
     [1, 2, 3], // temp & excess & frv
+
+    [6, 2, 3], // fw flow & excess & frv
+    [7, 2, 3], // fw util & excess & frv
   ];
 
   let checked: Record<string, boolean> = $state({
@@ -130,7 +133,7 @@
       feedwater_util.value = fw_util(feedwater_flow.value, singleFWpump);
       feedwater_util.uncertainty = fw_util_unc(feedwater_flow.value, feedwater_flow.uncertainty, singleFWpump);
     }
-    if (checked.tempEdit && checked.excEdit) {
+    if ((checked.tempEdit || checked.fwFlowEdit || checked.fwUtilEdit) && checked.excEdit) {
       excess.uncertainty = 0;
 
       if (lastEdited === 0 || !checked.frvEdit) {
