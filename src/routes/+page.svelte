@@ -588,7 +588,7 @@
   }
 </script>
 
-<div class="flex flex-row flex-wrap gap-4 justify-center items-center max-w-screen max-h-screen">
+<div class="flex flex-row flex-wrap gap-4 justify-center items-center max-w-screen h-screen">
   <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box column">
     <div class="title">Calculation Presets</div>
     <div class="grid grid-cols-2 gap-3 text-sm">
