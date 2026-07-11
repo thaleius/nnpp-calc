@@ -39,7 +39,7 @@ export function T(FRV: number, FR: number) {
 }
 
 export function T_unc(FRV: number, dFRV: number, FR: number, dFR: number) {
-  return (
+  return FRV === 0 ? 0 : (
     (2*1000**2*FR/FRV**2/C1 * dFR)**2 + (2*1000**2*FR**2/FRV**3/C1 * dFRV)**2 + ((1000*FR/FRV)**2 / C1**2 * dC1)**2
   )**(1/2) * k
 }
