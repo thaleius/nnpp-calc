@@ -359,9 +359,9 @@
       currentNotes.push("At least one of the turbines is operating at more than 100 % capacity.");
     }
 
-    if (flowRate1.value < 3.55 || flowRate2.value < 3.55 || flowRate1.value > 10.43 || flowRate2.value > 10.43) {
-      const lower = flowRate1.value < 3.55 || flowRate2.value < 3.55 ? "lower than 3.55&nbsp;m³/s" : "";
-      const higher = flowRate1.value > 10.43 || flowRate2.value > 10.43 ? "higher than 10.43&nbsp;m³/s" : "";
+    if (flowRate1.value < 2 || flowRate2.value < 2 || flowRate1.value > 10.55 || flowRate2.value > 10.55) {
+      const lower = flowRate1.value < 2.00 || flowRate2.value < 2.00 ? "lower than 2.00&nbsp;m³/s" : "";
+      const higher = flowRate1.value > 10.55 || flowRate2.value > 10.55 ? "higher than 10.55&nbsp;m³/s" : "";
 
       let s = "Turbine vibrations have not been researched for Flow Rates ";
 
