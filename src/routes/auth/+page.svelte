@@ -1,6 +1,7 @@
 <script lang="ts">
   import { browser } from "$app/env";
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { Socket } from "$lib/socket";
 
@@ -21,7 +22,7 @@
 
     socket.io.on('authed', (success) => {
       console.log(`Authorization ${success ? 'succeeded' : 'failed'}`)
-      goto('/');
+      goto(resolve('/'));
     })
 
     socket.io.connect();

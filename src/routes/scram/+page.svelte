@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import LZString from 'lz-string';
   
@@ -17,7 +18,7 @@
           const sessionCode = json.code;
           localStorage.setItem('sessionCode', sessionCode);
 
-          goto('/');
+          goto(resolve('/'));
         }
       } catch (error) {
         console.error('Error while decompressing share data:', error);
