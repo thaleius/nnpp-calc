@@ -21,7 +21,7 @@
 
     socket.io.on('authed', (success) => {
       console.log(`Authorization ${success ? 'succeeded' : 'failed'}`)
-      goto('/scram');
+      goto('/');
     })
 
     socket.io.connect();

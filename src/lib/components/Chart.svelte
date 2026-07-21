@@ -2,21 +2,17 @@
   import type { CalcResult } from "$lib/socket";
   import * as echarts from 'echarts';
 
-  interface DataPoint {
-    time: number;
-    temperature: number;
-    temperature_change: number;
-  }
-
   let {
     props,
     isPlaying = $bindable(),
+    currentTemp = $bindable(),
     currentSimTime = $bindable(),
     class: className
   }: {
     props: CalcResult,
     isPlaying: boolean,
     currentSimTime: number,
+    currentTemp: number,
     class: string
   } = $props();
 
@@ -33,6 +29,11 @@
     Math.min(data.length, Math.max(0, Math.floor((currentSimTime - startTime) / dt) + 1))
   );
   let currentData = $derived(data.slice(0, currentIndex));
+
+  $effect(() => {
+    if (data[currentIndex])
+      currentTemp = data[currentIndex].temperature;
+  });
 
   $effect(() => {
     if (!isPlaying) return;
