@@ -756,12 +756,34 @@
     });
   }
   
-  let announcements = $derived([
-		{ triggerTime: -10, text: 'Insert control rods' },
-		{ triggerTime: Math.floor(50 / 9 - 10), text: 'Open feedwater valves' },
-		{ triggerTime: scramTime - 10, text: 'Scram' },
-    { triggerTime: 50 - 10, text: 'Activate all coolant systems' }
-	]);
+  let announcements = $derived.by(() => {
+    const result = [
+      { triggerTime: -10, text: 'Insert control rods' },
+      { triggerTime: Math.floor(50 / 9 - 10), text: 'Open feedwater valves' }
+    ];
+
+    if (meltdownTime === 50) {
+      result.push({ triggerTime: 50 - 10, text: 'Meltdown imminent, activate all coolant systems' });
+    } else {
+      result.push({ triggerTime: meltdownTime - 10, text: 'Meltdown' });
+      
+      if (scramTime === 50) {
+        result.push({ triggerTime: 50 - 10, text: 'Scram and activate all coolant systems' });
+      } else {
+        result.push(
+          { triggerTime: 50 - 10, text: 'Activate all coolant systems' },
+          { triggerTime: scramTime - 10, text: 'Scram' }
+        );
+      }
+    }
+
+    result.push(
+      { triggerTime: 50 + 100 - 10, text: 'Open all release valves' },
+      { triggerTime: 50 + 200 - 10, text: 'Open all release valves' }
+    );
+
+    return result;
+  });
 
   let activeAnnouncements = $derived(
 		announcements
