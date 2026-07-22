@@ -845,6 +845,10 @@
   });
 
   let profile = $state<'calc' | 'scram'>('calc');
+
+  $effect(() => {
+    profile = shared ? 'scram' : 'calc';
+  })
 </script>
 
 <div class="relative w-screen h-screen overflow-hidden">
