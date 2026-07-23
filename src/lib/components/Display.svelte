@@ -67,11 +67,11 @@
   {/if}
   <div>
       <span>{pre}</span><input type="text" class="text-xl bg-transparent border-0 text-right p-0 {inputClass}" value={displayValue} oninput={(e) => {
-      onEdit();
       const input = sanitizeInput((e.target as HTMLInputElement).value);
       displayValue = input;
       isInternalUpdate = true;
       value = input === '' ? 0 : Number(input);
+      onEdit();
     }} readonly={!edit} />
     <span>{unit}</span>
   </div>
