@@ -3,7 +3,7 @@
   import Checkbox from "$lib/components/Checkbox.svelte";
   import Display from "$lib/components/Display.svelte";
   import TurbineUtil from "$lib/components/TurbineUtil.svelte";
-  import { dExc, dFR, dFRV, dT, excess_unc, FR, FR_power, FR_power_unc, FR_unc, FRV, FRV_unc, fw_flow, fw_flow_unc, fw_flow_util, fw_flow_util_unc, fw_util, fw_util_unc, power, power_unc, pressure, pressure_unc, T, T_fwFlow, T_fwFlow_unc, T_unc, vibration, vibration_unc } from "$lib/functions";
+  import { dExc, dFR, dFRV, dT, excess_unc, FR, FR_power, FR_power_unc, FR_unc, FRV, FRV_unc, fw_flow, fw_flow_unc, fw_flow_util, fw_flow_util_unc, fw_util, fw_util_unc, power, power_unc, pressure, pressure_unc, rpm, rpm_unc, T, T_fwFlow, T_fwFlow_unc, T_unc, vibration, vibration_unc } from "$lib/functions";
   import { page } from '$app/state';
   import { Clipboard } from "flowbite-svelte";
   import { PenSolid } from "flowbite-svelte-icons";
@@ -46,6 +46,15 @@
   let powerOutput2 = $state({
     value: 0,
     uncertainty: 0
+  });
+
+  let rpm1 = $derived({
+    value: rpm(flowRate1.value),
+    uncertainty: rpm_unc(flowRate1.uncertainty)
+  });
+  let rpm2 = $derived({
+    value: rpm(flowRate2.value),
+    uncertainty: rpm_unc(flowRate2.uncertainty)
   });
 
   let vibration1 = $derived({
@@ -896,11 +905,11 @@
       <div class="flex gap-x-1 [&>div]:w-1/2">
         <div>
           <div class="title text-center">Turbine 1</div>
-          <TurbineUtil onEdit={() => { handleModify(); handleEdit(1); }} bind:fr={flowRate1} bind:frEdit={checked.frEdit} bind:frv={flowRateValve1} bind:frvEdit={checked.frvEdit} bind:output={powerOutput1} vibration={vibration1} bind:outEdit={checked.outEdit} />
+          <TurbineUtil onEdit={() => { handleModify(); handleEdit(1); }} bind:fr={flowRate1} bind:frEdit={checked.frEdit} bind:frv={flowRateValve1} bind:frvEdit={checked.frvEdit} bind:rpm={rpm1} bind:output={powerOutput1} vibration={vibration1} bind:outEdit={checked.outEdit} />
         </div>
         <div>
           <div class="title text-center">Turbine 2</div>
-          <TurbineUtil onEdit={() => { handleModify(); handleEdit(2); }} bind:fr={flowRate2} bind:frEdit={checked.frEdit} bind:frv={flowRateValve2} bind:frvEdit={checked.frvEdit} bind:output={powerOutput2} vibration={vibration2} bind:outEdit={checked.outEdit} />
+          <TurbineUtil onEdit={() => { handleModify(); handleEdit(2); }} bind:fr={flowRate2} bind:frEdit={checked.frEdit} bind:frv={flowRateValve2} bind:frvEdit={checked.frvEdit} bind:rpm={rpm2} bind:output={powerOutput2} vibration={vibration2} bind:outEdit={checked.outEdit} />
         </div>
       </div>
     </div>

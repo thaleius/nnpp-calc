@@ -153,3 +153,11 @@ export function vibration_unc(fr: number, dfr: number) {
 
   return (df_C6**2 + df_C7**2 + df_fr**2)**(1/2) * k;
 }
+
+export function rpm(fr: number) {
+  return Math.max(900 * fr - 250, 0);
+}
+
+export function rpm_unc(dfr: number) {
+  return 900 * dfr * k;
+}
