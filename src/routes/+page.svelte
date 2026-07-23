@@ -864,28 +864,37 @@
 
 <div class="relative w-screen h-screen overflow-hidden">
   <div class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'calc' ? 0 : -100}vw);">
-    <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
-      <div class="title">Calculation Presets</div>
-      <div class="grid grid-cols-2 gap-3 text-sm">
-        <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 1 ? activeClass : inactiveClass}`} onclick={() => preset == 1 ? preset = -1 : preset = 1}>
-          <span class="text-xs uppercase opacity-75">Preset 01</span>
-          <span class="font-bold mt-1">Standard</span>
-        </button>
+    <div class="flex flex-col gap-y-4 w-92">
+      <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
+        <div class="title">Instructions</div>
+        <div class="flex flex-col gap-y-2">
+          <p>To modify certain values, select one or multiple options in the <span class="font-bold">EDIT</span> section.</p>
+          <p>You may also choose from the presets below.</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
+        <div class="title">Calculation Presets</div>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 1 ? activeClass : inactiveClass}`} onclick={() => preset == 1 ? preset = -1 : preset = 1}>
+            <span class="text-xs uppercase opacity-75">Preset 01</span>
+            <span class="font-bold mt-1">Standard</span>
+          </button>
 
-        <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 2 ? activeClass : inactiveClass}`} onclick={() => preset == 2 ? preset = -1 : preset = 2}>
-          <span class="text-xs uppercase opacity-60">Preset 02</span>
-          <span class="font-bold mt-1">POEA</span>
-        </button>
+          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 2 ? activeClass : inactiveClass}`} onclick={() => preset == 2 ? preset = -1 : preset = 2}>
+            <span class="text-xs uppercase opacity-60">Preset 02</span>
+            <span class="font-bold mt-1">POEA</span>
+          </button>
 
-        <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 3 ? activeClass : inactiveClass}`} onclick={() => preset == 3 ? preset = -1 : preset = 3}>
-          <span class="text-xs uppercase opacity-60">Preset 03</span>
-          <span class="font-bold mt-1">Turbines</span>
-        </button>
+          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 3 ? activeClass : inactiveClass}`} onclick={() => preset == 3 ? preset = -1 : preset = 3}>
+            <span class="text-xs uppercase opacity-60">Preset 03</span>
+            <span class="font-bold mt-1">Turbines</span>
+          </button>
 
-        <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 4 ? activeClass : inactiveClass}`} onclick={() => preset == 4 ? preset = -1 : preset = 4}>
-          <span class="text-xs uppercase opacity-60">Preset 04</span>
-          <span class="font-bold mt-1">POEA & Turbines</span>
-        </button>
+          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 4 ? activeClass : inactiveClass}`} onclick={() => preset == 4 ? preset = -1 : preset = 4}>
+            <span class="text-xs uppercase opacity-60">Preset 04</span>
+            <span class="font-bold mt-1">POEA & Turbines</span>
+          </button>
+        </div>
       </div>
     </div>
 
