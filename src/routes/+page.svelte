@@ -855,10 +855,15 @@
     }
   });
 
-  let profile = $state<'calc' | 'scram'>('calc');
+  let profile = $state<'calc' | 'scram'>(localStorage.getItem('profile') as 'calc' | 'scram' || 'calc');
 
   $effect(() => {
-    profile = shared ? 'scram' : 'calc';
+    localStorage.setItem('profile', profile);
+  })
+
+  $effect(() => {
+    if (shared)
+      profile = 'scram';
   })
 </script>
 
