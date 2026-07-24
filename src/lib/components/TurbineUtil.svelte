@@ -42,7 +42,7 @@
 <div class="flex flex-col gap-y-1">
   <Display onEdit={onEdit} name="Flow Rate Valve" bind:value={frv.value} uncertainty={frv.uncertainty} bind:edit={frvEdit} decimals={1} unit="%" inputClass="w-16" compact={true} />
   <Display onEdit={onEdit} name="Flow Rate" bind:value={fr.value} uncertainty={fr.uncertainty} bind:edit={frEdit} decimals={2} unit="m³/s" inputClass="w-16" compact={true} />
-  <Display onEdit={onEdit} name="RPM (unsynced)" bind:value={rpm.value} uncertainty={rpm.uncertainty} decimals={0} unit="" inputClass="w-15" compact={true} />
   <Display onEdit={onEdit} name="Power Output" bind:value={output.value} uncertainty={output.uncertainty} bind:edit={outEdit} decimals={1} unit="kW" inputClass="w-24" compact={true} />
+  <Display name="RPM (unsynced)" value={rpm.value} uncertainty={rpm.uncertainty} decimals={0} unit="" inputClass="w-15" compact={true} />
   <Display name="Vibration" value={vibration.value} uncertainty={vibration.uncertainty} decimals={0} unit="µm" inputClass="w-9" compact={true} />
 </div>
