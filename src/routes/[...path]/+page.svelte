@@ -128,6 +128,8 @@
     lastEdited = v;
   }
 
+  const getPath = () => page.params.path?.replace(/\//g, '') as profileType || 'calc';
+
   $effect(() => {
     let currentNotes: string[] = [];
     if (checked.tempEdit) {
@@ -455,65 +457,75 @@
         const sharedConfig = LZString.decompressFromEncodedURIComponent(shareData);
         if (sharedConfig) {
           const json = JSON.parse(sharedConfig);
-          if (json.temp)
-            temp.value = json.temp;
-          if (json.excess)
-            excess.value = json.excess;
-          if (json.frv1)
-            flowRateValve1.value = json.frv1;
-          if (json.frv2)
-            flowRateValve2.value = json.frv2;
-          if (json.fr1)
-            flowRate1.value = json.fr1;
-          if (json.fr2)
-            flowRate2.value = json.fr2;
-          if (json.po1)
-            powerOutput1.value = json.po1;
-          if (json.po2)
-            powerOutput2.value = json.po2;
-          if (json.t2p)
-            turbsToPrimary = json.t2p;
-          if (json.fwFlow)
-            feedwater_flow.value = json.fwFlow;
-          if (json.fwUtil)
-            feedwater_util.value = json.fwUtil;
-          if (json.sFW)
-            singleFWpump = json.sFW;
-          if (json.preset)
-            preset = json.preset;
+          if (getPath() === 'scram') {
+            socketUrl = json.server;
+            localStorage.setItem('socketUrl', socketUrl);
+            sessionCode = json.code;
+            localStorage.setItem('sessionCode', sessionCode);
 
-          if (json.checked) {
-            checked.tempEdit = !!json.checked.tempEdit;
-            checked.excEdit = !!json.checked.excEdit;
-            checked.frEdit = !!json.checked.frEdit;
-            checked.frvEdit = !!json.checked.frvEdit;
-            checked.outEdit = !!json.checked.outEdit;
-            checked.fwFlowEdit = !!json.checked.fwFlowEdit;
-            checked.fwUtilEdit = !!json.checked.fwUtilEdit;
-            
-            if (json.checked.tempEdit) {
-              temp.uncertainty = 0;
-            }
-            if (json.checked.excEdit) {
-              excess.uncertainty = 0;
-            }
-            if (json.checked.frEdit) {
-              flowRate1.uncertainty = 0;
-              flowRate2.uncertainty = 0;
-            }
-            if (json.checked.frvEdit) {
-              flowRateValve1.uncertainty = 0;
-              flowRateValve2.uncertainty = 0;
-            }
-            if (json.checked.outEdit) {
-              powerOutput1.uncertainty = 0;
-              powerOutput2.uncertainty = 0;
-            }
-            if (json.checked.fwFlowEdit) {
-              feedwater_flow.uncertainty = 0;
-            }
-            if (json.checked.fwUtilEdit) {
-              feedwater_util.uncertainty = 0;
+            connectShared();
+          } else {
+            console.log(json)
+            if (json.temp)
+              temp.value = json.temp;
+            if (json.excess)
+              excess.value = json.excess;
+            if (json.frv1)
+              flowRateValve1.value = json.frv1;
+            if (json.frv2)
+              flowRateValve2.value = json.frv2;
+            if (json.fr1)
+              flowRate1.value = json.fr1;
+            if (json.fr2)
+              flowRate2.value = json.fr2;
+            if (json.po1)
+              powerOutput1.value = json.po1;
+            if (json.po2)
+              powerOutput2.value = json.po2;
+            if (json.t2p)
+              turbsToPrimary = json.t2p;
+            if (json.fwFlow)
+              feedwater_flow.value = json.fwFlow;
+            if (json.fwUtil)
+              feedwater_util.value = json.fwUtil;
+            if (json.sFW)
+              singleFWpump = json.sFW;
+            if (json.preset)
+              preset = json.preset;
+
+            if (json.checked) {
+              checked.tempEdit = !!json.checked.tempEdit;
+              checked.excEdit = !!json.checked.excEdit;
+              checked.frEdit = !!json.checked.frEdit;
+              checked.frvEdit = !!json.checked.frvEdit;
+              checked.outEdit = !!json.checked.outEdit;
+              checked.fwFlowEdit = !!json.checked.fwFlowEdit;
+              checked.fwUtilEdit = !!json.checked.fwUtilEdit;
+              
+              if (json.checked.tempEdit) {
+                temp.uncertainty = 0;
+              }
+              if (json.checked.excEdit) {
+                excess.uncertainty = 0;
+              }
+              if (json.checked.frEdit) {
+                flowRate1.uncertainty = 0;
+                flowRate2.uncertainty = 0;
+              }
+              if (json.checked.frvEdit) {
+                flowRateValve1.uncertainty = 0;
+                flowRateValve2.uncertainty = 0;
+              }
+              if (json.checked.outEdit) {
+                powerOutput1.uncertainty = 0;
+                powerOutput2.uncertainty = 0;
+              }
+              if (json.checked.fwFlowEdit) {
+                feedwater_flow.uncertainty = 0;
+              }
+              if (json.checked.fwUtilEdit) {
+                feedwater_util.uncertainty = 0;
+              }
             }
           }
         }
@@ -663,7 +675,7 @@
         code: sessionCode
       }
 
-      const url = new URL(window.location.origin + window.location.pathname + 'scram/');
+      const url = new URL(window.location.origin + window.location.pathname);
 
       const jsonString = JSON.stringify(json);
       const compressed = LZString.compressToEncodedURIComponent(jsonString);
@@ -754,18 +766,23 @@
 
   let isConnecting = false;
   let shared = $state(false);
+
+  const connectShared = () => {
+    shared = true;
+    isOwner = false;
+    if (isAuthed) {
+      loadData();
+    } else if (!isConnecting && !connectionStatus) {
+      isConnecting = true;
+      connect();
+    }
+  }
+
   $effect(() => {
     const code = localStorage.getItem('sessionCode');
     if (code) {
-      shared = true;
-      isOwner = false;
       sessionCode = code;
-      if (isAuthed) {
-        loadData();
-      } else if (!isConnecting && !connectionStatus) {
-        isConnecting = true;
-        connect();
-      }
+      connectShared();
     }
   })
 
@@ -923,15 +940,15 @@
   });
 
   type profileType = 'calc' | 'scram' | 'sync';
-  let profile = $state<profileType>(localStorage.getItem('profile') as profileType || 'calc');
+  let profile = $state<profileType>(getPath() || 'calc');
 
   $effect(() => {
     localStorage.setItem('profile', profile);
-  })
-
-  $effect(() => {
-    if (shared)
-      profile = 'scram';
+    goto(`/${profile}/`, { 
+      replaceState: true, 
+      keepFocus: true, 
+      noScroll: true 
+    });
   })
 </script>
 
@@ -978,7 +995,7 @@
           <Display name="Pressure" bind:value={pres} uncertainty={pres_unc} decimals={1} unit="kPa" inputClass="w-24" wrapperClass="w-full" compact onEdit={handleModify} />
           <!-- <Display name="Uncertainty" bind:value={pres_unc} decimals={1} unit="kPa" pre="&#177;" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} /> -->
         </div>
-        <Display name="Excess" bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact />
+        <Display name="Excess" bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact onEdit={handleModify} />
         <div class="flex flex-row gap-x-1">
           <Display name="Feedwater Flow Rate" bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} />
           <Display name="Feedwater Utilization" bind:value={feedwater_util.value} uncertainty={feedwater_util.uncertainty} bind:edit={checked.fwUtilEdit} decimals={1} unit="%" inputClass="w-16" wrapperClass="w-full" compact onEdit={handleModify} />
