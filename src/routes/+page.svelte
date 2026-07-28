@@ -12,7 +12,8 @@
   import { emptyCalc, Socket, type CalcResult } from '$lib/socket';
   import Chart from '$lib/components/Chart.svelte';
   import { untrack } from 'svelte';
-    import Stack from '$lib/components/Stack.svelte';
+  import Stack from '$lib/components/Stack.svelte';
+  import TurbineSim from '$lib/components/TurbineSim.svelte';
 
   let temp = $state({
     value: 423,
@@ -788,28 +789,28 @@
   
   let announcements = $derived.by(() => {
     const result = [
-      { triggerTime: -10, text: 'Insert control rods' },
-      { triggerTime: Math.floor(50 / 9 - 10), text: 'Open feedwater valves' }
+      { id: 0, triggerTime: -10, text: 'Insert control rods' },
+      { id: 1, triggerTime: Math.floor(50 / 9 - 10), text: 'Open feedwater valves' }
     ];
 
     if (meltdownTime === 50) {
-      result.push({ triggerTime: 50 - 10, text: 'Meltdown imminent, activate all coolant systems' });
+      result.push({ id: 2, triggerTime: 50 - 10, text: 'Meltdown imminent, activate all coolant systems' });
     } else {
-      result.push({ triggerTime: meltdownTime - 10, text: 'Meltdown' });
+      result.push({ id: 3, triggerTime: meltdownTime - 10, text: 'Meltdown' });
       
       if (scramTime === 50) {
-        result.push({ triggerTime: 50 - 10, text: 'Scram and activate all coolant systems' });
+        result.push({ id: 4, triggerTime: 50 - 10, text: 'Scram and activate all coolant systems' });
       } else {
         result.push(
-          { triggerTime: 50 - 10, text: 'Activate all coolant systems' },
-          { triggerTime: scramTime - 10, text: 'Scram' }
+          { id: 5, triggerTime: 50 - 10, text: 'Activate all coolant systems' },
+          { id: 6, triggerTime: scramTime - 10, text: 'Scram' }
         );
       }
     }
 
     result.push(
-      { triggerTime: 50 + 100 - 10, text: 'Open all releave valves' },
-      { triggerTime: 50 + 200 - 10, text: 'Open all releave valves' }
+      { id: 7, triggerTime: 50 + 100 - 10, text: 'Open all releave valves' },
+      { id: 8, triggerTime: 50 + 200 - 10, text: 'Open all releave valves' }
     );
 
     return result;
@@ -825,7 +826,7 @@
 				const secondsLeft = Math.max(0, targetTime - currentSimTime);
 
 				return {
-					id: a.text,
+					id: a.id,
 					secondsLeft,
 					text: a.text
 				};
@@ -833,7 +834,6 @@
 	);
 
   let currentUtterance: SpeechSynthesisUtterance | null = null;
-  const playedAnnouncements = new Set<string>();
 
   function playAnnouncement(text: string) {
     if (!isOwner && !audioUnlocked) return;
@@ -847,6 +847,8 @@
 
     window.speechSynthesis.speak(currentUtterance);
   }
+  
+  const playedAnnouncements = new Set<number>();
 
   $effect(() => {
     for (const announcement of activeAnnouncements) {
@@ -857,7 +859,71 @@
     }
   });
 
-  let profile = $state<'calc' | 'scram'>(localStorage.getItem('profile') as 'calc' | 'scram' || 'calc');
+  // turbine sync sim
+  let turbineSimIsPlaying = $state(false);
+  let turbineSimCurrentSimTime = $state(-15);
+  let currentRpm = $state(0);
+  let targetRpm = $state(2995);
+  let optimalSwitchTime = $state(0);
+  let turbineSimValveEndTime = $state(0);
+  let frvState = $state<'++' | '+' | '0' | '-' | '--'>('0');
+  // svelte-ignore non_reactive_update
+  // svelte-ignore state_referenced_locally
+  let turbineInputTime = turbineSimCurrentSimTime;
+  
+  let turbineAnnouncements = $derived.by(() => {
+    const result = [
+      { id: 0, triggerTime: -10, targetTime: 0, text: `Set flow rate valve to "++" in ${Math.ceil(-turbineSimCurrentSimTime+0)} Seconds` },
+      { id: 1, triggerTime: -3, targetTime: 0, text: '3', hide: true },
+      { id: 2, triggerTime: -2, targetTime: 0, text: '2', hide: true },
+      { id: 3, triggerTime: -1, targetTime: 0, text: '1', hide: true },
+      { id: 4, triggerTime: 0, targetTime: 0, text: '0', hide: true },
+      { id: 5, triggerTime: optimalSwitchTime-10, targetTime: optimalSwitchTime, text: `Set flow rate valve to "−−" in ${Math.ceil(-turbineSimCurrentSimTime+optimalSwitchTime)} Seconds` },
+      { id: 6, triggerTime: optimalSwitchTime-3, targetTime: optimalSwitchTime, text: '3', hide: true },
+      { id: 7, triggerTime: optimalSwitchTime-2, targetTime: optimalSwitchTime, text: '2', hide: true },
+      { id: 8, triggerTime: optimalSwitchTime-1, targetTime: optimalSwitchTime, text: '1', hide: true },
+      { id: 9, triggerTime: optimalSwitchTime, targetTime: optimalSwitchTime, text: '0', hide: true },
+      { id: 10, triggerTime: turbineSimValveEndTime-10, targetTime: turbineSimValveEndTime, text: `Set flow rate valve to neutral in ${Math.ceil(-turbineSimCurrentSimTime+turbineSimValveEndTime)} Seconds` },
+      { id: 11, triggerTime: turbineSimValveEndTime-3, targetTime: turbineSimValveEndTime, text: '3', hide: true },
+      { id: 12, triggerTime: turbineSimValveEndTime-2, targetTime: turbineSimValveEndTime, text: '2', hide: true },
+      { id: 13, triggerTime: turbineSimValveEndTime-1, targetTime: turbineSimValveEndTime, text: '1', hide: true },
+      { id: 14, triggerTime: turbineSimValveEndTime, targetTime: turbineSimValveEndTime, text: '0', hide: true },
+    ];
+
+    return result;
+  });
+
+  let activeTurbineAnnouncements = $derived(
+		turbineAnnouncements
+			.filter((a) => {
+        return turbineSimCurrentSimTime !== 0 && a.triggerTime - .35 <= turbineSimCurrentSimTime && a.targetTime - turbineSimCurrentSimTime > 0;
+      })
+			.map((a) => {
+				const targetTime = a.targetTime;
+				const secondsLeft = Math.max(0, targetTime - turbineSimCurrentSimTime);
+
+				return {
+					id: a.id,
+					secondsLeft,
+					text: a.text,
+          hide: a.hide
+				};
+			})
+	);
+
+  const playedTurbineAnnouncements = new Set<number>();
+
+  $effect(() => {
+    for (const announcement of activeTurbineAnnouncements) {
+      if (!playedTurbineAnnouncements.has(announcement.id)) {
+        playedTurbineAnnouncements.add(announcement.id);
+        playAnnouncement(announcement.text);
+      }
+    }
+  });
+
+  type profileType = 'calc' | 'scram' | 'sync';
+  let profile = $state<profileType>(localStorage.getItem('profile') as profileType || 'calc');
 
   $effect(() => {
     localStorage.setItem('profile', profile);
@@ -870,7 +936,7 @@
 </script>
 
 <div class="relative w-screen h-screen overflow-hidden">
-  <div class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'calc' ? 0 : -100}vw);">
+  <div class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'calc' ? 0 : profile === 'sync' ? 100 : -100}vw);">
     <div class="flex flex-col gap-y-4 w-92">
       <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
         <div class="title">Instructions</div>
@@ -970,7 +1036,7 @@
     </div>
   </div>
 
-  <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'scram' ? 0 : 100}vw);">
+  <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'scram' ? 0 : profile === 'sync' ? 200 : 100}vw);">
     <div class="flex flex-row gap-4 justify-center items-center">
       <div class="self-start">
         <Stack items={activeAnnouncements} />
@@ -1100,18 +1166,76 @@
     </div>
   </div>
 
+  <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'sync' ? 0 : profile === 'calc' ? -100 : -200}vw);">
+    <div class="flex flex-row gap-4 justify-center items-center">
+      <div class="self-start">
+        <Stack items={activeTurbineAnnouncements} />
+      </div>
+      <div class="flex flex-col gap-y-2 box">
+        <TurbineSim temp={temp.value} bind:currentRpm={currentRpm} bind:currentFR={flowRate1.value} bind:currentFRVState={frvState} targetRpm={targetRpm} bind:optimalSwitchTime={optimalSwitchTime} bind:currentSimTime={turbineSimCurrentSimTime} bind:valveEndTime={turbineSimValveEndTime} bind:isPlaying={turbineSimIsPlaying}  class="w-200 h-150" />
+      </div>
+      <div class="flex flex-col gap-y-4">
+        <div class="box flex flex-col">
+          <div class="title">
+            Animation
+          </div>
+          <div class="flex flex-col gap-2 items-center w-64">
+            <div class="flex flex-row gap-2 w-full">
+              <Display name="Temperature" bind:value={temp.value} uncertainty={temp.uncertainty} showUncertainty={false} edit={true} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" compact onEdit={() => { if (!checked.tempEdit) checked.tempEdit = true; updateSelection('tempEdit', checked.tempEdit); }} />
+              <Display name="Target RPM" bind:value={targetRpm} edit={true} showUncertainty={false} decimals={0} unit="" inputClass="w-12" wrapperClass="text-orange-300 w-full" compact={true} />
+            </div>
+            <div class="flex flex-row gap-2 w-full">
+              <Display onEdit={() => turbineInputTime = turbineSimCurrentSimTime} name="Time" allowedCharacters='-' compact showUncertainty={false} edit={true} bind:value={turbineSimCurrentSimTime} decimals={1} unit="s" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
+            </div>
+            <div class="flex flex-row gap-2 w-full">
+              <button onclick={() => {
+                if (turbineSimCurrentSimTime < turbineSimValveEndTime + 10) {
+                  turbineSimIsPlaying = !turbineSimIsPlaying;
+                }
+              }} class="button w-full">
+                {turbineSimIsPlaying ? 'Pause' : turbineSimCurrentSimTime > turbineInputTime ? 'Continue' : 'Start'}
+              </button>
+              
+              <button onclick={() => { {
+                turbineSimIsPlaying = false;
+                turbineSimCurrentSimTime = turbineInputTime > 0 ? -15 : turbineInputTime;
+
+                playedTurbineAnnouncements.clear();
+                window.speechSynthesis.cancel();
+              }}} class="button w-full">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {#if profile === 'calc' || profile === 'sync'}
+  <!-- right button -->
   <button 
-    class={`absolute top-1/2 ${profile === 'calc' ? 'right-8 translate-x-1/2 rotate-90' : 'left-8 -translate-x-1/2 -rotate-90'} -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg`}
+    class={`absolute top-1/2 right-8 translate-x-1/2 rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg`}
     onclick={() => profile = profile === 'calc' ? 'scram' : 'calc'}
   >
     {profile === 'calc' ? 'SCRAM Calculator' : 'Calculator'}
   </button>
+  {/if}
+  {#if profile === 'calc' || profile === 'scram'}
+  <!-- left button -->
+  <button 
+    class={`absolute top-1/2 left-8 -translate-x-1/2 -rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg`}
+    onclick={() => profile = profile === 'calc' ? 'sync' : 'calc'}
+  >
+    {profile === 'calc' ? 'Turbine Sync Calculator' : 'Calculator'}
+  </button>
+  {/if}
 </div>
 
 <style lang="postcss">
   @reference "tailwindcss";
 
-  #scram {
+  #scram, #sync {
     input {
       @apply bg-[#1e1e1e] border-orange-300 text-orange-300;
     }

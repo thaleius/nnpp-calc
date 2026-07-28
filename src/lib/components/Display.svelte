@@ -7,6 +7,8 @@
     decimals,
     unit,
     pre,
+    allowedCharacters = '',
+    type = 'number',
     wrapperClass,
     inputClass,
     compact,
@@ -14,12 +16,14 @@
     onEdit = () => {}
   }: {
     name: string,
-    value: number,
+    value: number | string,
     uncertainty?: number,
     edit?: boolean,
     decimals: number,
     unit: string,
     pre?: string,
+    allowedCharacters?: string,
+    type?: 'number' | 'text',
     wrapperClass?: string,
     inputClass?: string,
     compact?: boolean,
@@ -28,7 +32,7 @@
   } = $props();
 
   // svelte-ignore state_referenced_locally
-  let displayValue = $state(value !== undefined && value !== null ? value.toFixed(decimals) : '');
+  let displayValue = $state(value !== undefined && value !== null ? type === 'number' ? (value as number).toFixed(decimals) : value : '');
   let isInternalUpdate = false;
 
   $effect(() => {
@@ -36,13 +40,14 @@
       if (isInternalUpdate) {
         isInternalUpdate = false;
       } else {
-        displayValue = value.toFixed(decimals);
+        displayValue = type === 'number' ? (value as number).toFixed(decimals) : value;
       }
     }
   });
 
   function sanitizeInput(input: string) {
-    let sanitized = input.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+    const regexp = new RegExp(`[^0-9.${allowedCharacters.replace(/\-/g, '\\-')}]`, 'g');
+    let sanitized = input.replace(/,/g, '.').replace(regexp, '');
     
     const parts = sanitized.split('.');
     if (parts.length > 2) {
@@ -66,7 +71,7 @@
     <span>{name}: </span>
   {/if}
   <div>
-      <span>{pre}</span><input type="text" class="text-xl bg-transparent border-0 text-right p-0 {inputClass}" value={displayValue} oninput={(e) => {
+      <span>{pre}</span><input type="text" class="text-xl bg-transparent border-0 p-0 text-right {inputClass}" value={displayValue} oninput={(e) => {
       const input = sanitizeInput((e.target as HTMLInputElement).value);
       displayValue = input;
       isInternalUpdate = true;

@@ -32,7 +32,7 @@ html {
 }
 
 .box {
-  @apply border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)];
+  @apply border-[#3b3b3b] border-2 rounded-lg p-5 shadow-[0_0_15px_rgba(0,0,0,0.05)] bg-[#1e1e1e];
 }
 
 .column {
