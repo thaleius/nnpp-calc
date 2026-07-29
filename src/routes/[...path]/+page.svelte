@@ -7,6 +7,7 @@
   import { page } from '$app/state';
   import { Clipboard } from "flowbite-svelte";
   import { PenSolid } from "flowbite-svelte-icons";
+  import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
   import { notesPre } from '$lib/api';
   import { emptyCalc, Socket, type CalcResult } from '$lib/socket';
