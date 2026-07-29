@@ -885,6 +885,7 @@
   let optimalSwitchTime = $state(0);
   let turbineSimValveEndTime = $state(0);
   let frvState = $state<'++' | '+' | '0' | '-' | '--'>('0');
+  let currentFR = $state(0);
   // svelte-ignore non_reactive_update
   // svelte-ignore state_referenced_locally
   let turbineInputTime = turbineSimCurrentSimTime;
@@ -1190,7 +1191,7 @@
         <Stack items={activeTurbineAnnouncements} />
       </div>
       <div class="flex flex-col gap-y-2 box">
-        <TurbineSim temp={temp.value} bind:currentRpm={currentRpm} bind:currentFR={flowRate1.value} bind:currentFRVState={frvState} targetRpm={targetRpm} bind:optimalSwitchTime={optimalSwitchTime} bind:currentSimTime={turbineSimCurrentSimTime} bind:valveEndTime={turbineSimValveEndTime} bind:isPlaying={turbineSimIsPlaying}  class="w-200 h-150" />
+        <TurbineSim temp={temp.value} bind:currentRpm={currentRpm} bind:currentFR={currentFR} bind:currentFRVState={frvState} targetRpm={targetRpm} bind:optimalSwitchTime={optimalSwitchTime} bind:currentSimTime={turbineSimCurrentSimTime} bind:valveEndTime={turbineSimValveEndTime} bind:isPlaying={turbineSimIsPlaying}  class="w-200 h-150" />
       </div>
       <div class="flex flex-col gap-y-4">
         <div class="box flex flex-col">
