@@ -945,7 +945,7 @@
 
   $effect(() => {
     localStorage.setItem('profile', profile);
-    goto(resolve(`${profile}/`), { 
+    goto(resolve(`/${profile}/`), { 
       replaceState: true, 
       keepFocus: true, 
       noScroll: true 
