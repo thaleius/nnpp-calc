@@ -15,6 +15,7 @@
   import { untrack } from 'svelte';
   import Stack from '$lib/components/Stack.svelte';
   import TurbineSim from '$lib/components/TurbineSim.svelte';
+  import TemperatureCalculator from '$lib/components/TemperatureCalculator.svelte';
 
   let temp = $state({
     value: 423,
@@ -941,7 +942,7 @@
     }
   });
 
-  type profileType = 'calc' | 'scram' | 'sync';
+  type profileType = 'calc' | 'scram' | 'sync' | 'temp';
   let profile = $state<profileType>(getPath() || 'calc');
 
   $effect(() => {
@@ -1054,7 +1055,11 @@
     </div>
   </div>
 
-  <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'scram' ? 0 : profile === 'sync' ? 200 : 100}vw);">
+  <div id="temp" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'temp' ? 0 : profile === 'scram' ? -100 : 100}vw);">
+    <TemperatureCalculator />
+  </div>
+
+  <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'scram' ? 0 : 100}vw);">
     <div class="flex justify-center items-center box px-4 py-2 text-orange-300">
       Currently unavailable
     </div>
@@ -1187,7 +1192,7 @@
     </div> -->
   </div>
 
-  <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'sync' ? 0 : profile === 'calc' ? -100 : -200}vw);">
+  <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'sync' ? 0 : -100}vw);">
     <div class="flex flex-row gap-4 justify-center items-center">
       <div class="self-start">
         <Stack items={activeTurbineAnnouncements} />
@@ -1233,22 +1238,22 @@
     </div>
   </div>
 
-  {#if profile === 'calc' || profile === 'sync'}
+  {#if profile === 'calc' || profile === 'sync' || profile === 'temp'}
   <!-- right button -->
   <button 
     class={`absolute top-1/2 right-8 translate-x-1/2 rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg`}
-    onclick={() => profile = profile === 'calc' ? 'scram' : 'calc'}
+    onclick={() => profile = profile === 'calc' ? 'temp' : profile === 'temp' ? 'scram' : 'calc'}
   >
-    {profile === 'calc' ? 'SCRAM Calculator' : 'Calculator'}
+    {profile === 'calc' ? 'Temperature Calculator' : profile === 'temp' ? 'Scram Calculator' : 'Calculator'}
   </button>
   {/if}
-  {#if profile === 'calc' || profile === 'scram'}
+  {#if profile === 'calc' || profile === 'scram' || profile === 'temp'}
   <!-- left button -->
   <button 
     class={`absolute top-1/2 left-8 -translate-x-1/2 -rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg`}
-    onclick={() => profile = profile === 'calc' ? 'sync' : 'calc'}
+    onclick={() => profile = profile === 'calc' ? 'sync' : profile === 'scram' ? 'temp' : 'calc'}
   >
-    {profile === 'calc' ? 'Turbine Sync Calculator' : 'Calculator'}
+    {profile === 'calc' ? 'Turbine Sync Calculator' : profile === 'scram' ? 'Temperature Calculator' : 'Calculator'}
   </button>
   {/if}
 </div>
