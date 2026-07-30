@@ -1056,7 +1056,10 @@
   </div>
 
   <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'scram' ? 0 : profile === 'sync' ? 200 : 100}vw);">
-    <div class="flex flex-row gap-4 justify-center items-center">
+    <div class="flex justify-center items-center box px-4 py-2 text-orange-300">
+      Currently unavailable
+    </div>
+    <!-- <div class="flex flex-row gap-4 justify-center items-center">
       <div class="self-start">
         <Stack items={activeAnnouncements} />
       </div>
@@ -1182,7 +1185,7 @@
         </div>
         {/if}
       </div>
-    </div>
+    </div> -->
   </div>
 
   <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'sync' ? 0 : profile === 'calc' ? -100 : -200}vw);">
