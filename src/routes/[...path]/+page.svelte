@@ -993,14 +993,13 @@
     <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] box">
       <div class="flex flex-col gap-y-1">
         <div class="flex flex-row gap-x-1">
-          <Display name="Temperature" bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
-          <Display name="Pressure" bind:value={pres} uncertainty={pres_unc} decimals={1} unit="kPa" inputClass="w-24" wrapperClass="w-full" compact onEdit={handleModify} />
-          <!-- <Display name="Uncertainty" bind:value={pres_unc} decimals={1} unit="kPa" pre="&#177;" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} /> -->
+          <Display name="Temperature" min={323} max={20000} bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
+          <Display name="Pressure" min={101.3} max={101.3 + 6.53421059705648 * (20000 - 323)} bind:value={pres} uncertainty={pres_unc} decimals={1} unit="kPa" inputClass="w-24" wrapperClass="w-full" compact onEdit={handleModify} />
         </div>
-        <Display name="Excess" bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact onEdit={handleModify} />
+        <Display name="Excess" min={0} max={2 * 5499 * (1/10 * Math.sqrt(6.53421059705648 * (20000 - 323)) - 3.61)} bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact onEdit={handleModify} />
         <div class="flex flex-row gap-x-1">
-          <Display name="Feedwater Flow Rate" bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} />
-          <Display name="Feedwater Utilization" bind:value={feedwater_util.value} uncertainty={feedwater_util.uncertainty} bind:edit={checked.fwUtilEdit} decimals={1} unit="%" inputClass="w-16" wrapperClass="w-full" compact onEdit={handleModify} />
+          <Display name="Feedwater Flow Rate" min={0} max={1/10 * Math.sqrt(6.53421059705648 * (20000 - 323))} bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} />
+          <Display name="Feedwater Utilization" min={0} max={100} bind:value={feedwater_util.value} uncertainty={feedwater_util.uncertainty} bind:edit={checked.fwUtilEdit} decimals={1} unit="%" inputClass="w-16" wrapperClass="w-full" compact onEdit={handleModify} />
         </div>
       </div>
       <div class="flex gap-x-1 [&>div]:w-1/2">
@@ -1203,11 +1202,11 @@
           </div>
           <div class="flex flex-col gap-2 items-center w-64">
             <div class="flex flex-row gap-2 w-full">
-              <Display name="Temperature" bind:value={temp.value} uncertainty={temp.uncertainty} showUncertainty={false} edit={true} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" compact onEdit={() => { if (!checked.tempEdit) checked.tempEdit = true; updateSelection('tempEdit', checked.tempEdit); }} />
-              <Display name="Target RPM" bind:value={targetRpm} edit={true} showUncertainty={false} decimals={0} unit="" inputClass="w-12" wrapperClass="text-orange-300 w-full" compact={true} />
+              <Display name="Temperature" min={500} max={3119} bind:value={temp.value} uncertainty={temp.uncertainty} showUncertainty={false} edit={true} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" compact onEdit={() => { if (!checked.tempEdit) checked.tempEdit = true; updateSelection('tempEdit', checked.tempEdit); }} />
+              <Display name="Target RPM" min={0} max={4999} bind:value={targetRpm} edit={true} showUncertainty={false} decimals={0} unit="" inputClass="w-12" wrapperClass="text-orange-300 w-full" compact={true} />
             </div>
             <div class="flex flex-row gap-2 w-full">
-              <Display onEdit={() => turbineInputTime = turbineSimCurrentSimTime} name="Time" allowedCharacters='-' compact showUncertainty={false} edit={true} bind:value={turbineSimCurrentSimTime} decimals={1} unit="s" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
+              <Display onEdit={() => turbineInputTime = turbineSimCurrentSimTime} name="Time" compact showUncertainty={false} edit={true} bind:value={turbineSimCurrentSimTime} decimals={1} unit="s" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
             </div>
             <div class="flex flex-row gap-2 w-full">
               <button onclick={() => {
