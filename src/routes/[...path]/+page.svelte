@@ -996,7 +996,7 @@
     <div class="flex flex-col gap-y-4 max-w-full md:w-110 bg-[#1e1e1e] box md:max-h-full md:overflow-y-auto">
       <div class="flex flex-col gap-y-1">
         <div class="flex flex-row gap-x-1">
-          <Display name="Temperature" min={323} max={20000} bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
+          <Display name="Temperature" min={0} max={20000} bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
           <Display name="Pressure" min={101.3} max={101.3 + 6.53421059705648 * (20000 - 323)} bind:value={pres} uncertainty={pres_unc} decimals={1} unit="kPa" inputClass="w-24" wrapperClass="w-full" compact onEdit={handleModify} />
         </div>
         <Display name="Excess" min={0} max={2 * 5499 * (1/10 * Math.sqrt(6.53421059705648 * (20000 - 323)) - 3.61)} bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact onEdit={handleModify} />
