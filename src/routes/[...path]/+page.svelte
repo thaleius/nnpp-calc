@@ -991,7 +991,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] box md:h-full md:overflow-y-auto">
+    <div class="flex flex-col gap-y-4 max-w-full md:w-110 bg-[#1e1e1e] box md:max-h-full md:overflow-y-auto">
       <div class="flex flex-col gap-y-1">
         <div class="flex flex-row gap-x-1">
           <Display name="Temperature" min={323} max={20000} bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
@@ -1014,7 +1014,7 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-col gap-y-4 w-full md:w-66 md:h-full md:overflow-y-auto">
+    <div class="flex flex-col justify-center gap-y-4 w-full md:w-66 md:h-full md:overflow-y-auto">
       <div class="flex flex-col bg-[#1e1e1e] box">
         <div class="flex flex-col gap-y-2">
           <Checkbox text="Turbines powering Primary grid?" labelClass="leading-none" bind:checked={turbsToPrimary} onchange={() => handleModify() } />

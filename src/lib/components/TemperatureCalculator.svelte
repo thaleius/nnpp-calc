@@ -22,7 +22,7 @@
   let tempROC = $derived(baseHeating + fuelHeating + (meltdown ? 18 : 0) - (controlRodCooling + feedwaterCooling + coolantCooling + (scram ? 21 : 0)));
 </script>
 
-<div class="flex flex-row gap-x-4 justify-center items-center flex-wrap">
+<div class="flex flex-row gap-4 justify-center items-center flex-wrap">
   <div class="flex flex-col gap-y-1 box w-full md:w-70">
     <Display name="Control Rod insertion" bind:value={controlRodInsertion} min={0} max={100} compact decimals={0} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
     <Display name="Fuel level" bind:value={fuelLevel} min={0} max={100} compact decimals={1} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
@@ -34,8 +34,8 @@
     }} />
   </div>
 
-  <div class="flex flex-col gap-y-4">
-    <div class="flex flex-col box w-full md:w-70">
+  <div class="flex flex-col gap-y-4 w-full md:w-70">
+    <div class="flex flex-col box w-full">
       <div class="title">Coolants</div>
       <div class="flex flex-col gap-y-1">
         <Checkbox text="Feedwater valves" bind:checked={feedwaterValves} />
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col box w-full md:w-70">
+    <div class="flex flex-col box w-full">
       <div class="title">Meltdown</div>
       <div class="flex flex-col gap-y-1">
         <Checkbox text="Meltdown" bind:checked={meltdown} onchange={() => {

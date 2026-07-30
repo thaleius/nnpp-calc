@@ -65,7 +65,7 @@
   {wrapperClass}
 ">
   {#if compact}
-    <span class="text-xs uppercase tracking-wider text-neutral-400">{name}</span>
+    <span class="text-xs uppercase tracking-wider text-neutral-400 text-center">{name}</span>
   {:else}
     <span>{name}: </span>
   {/if}
