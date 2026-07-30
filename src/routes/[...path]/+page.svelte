@@ -956,8 +956,8 @@
 </script>
 
 <div class="relative w-screen h-screen overflow-hidden">
-  <div class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'calc' ? 0 : profile === 'sync' ? 100 : -100}vw);">
-    <div class="flex flex-col gap-y-4 w-92">
+  <div id="calc" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out overflow-y-auto md:overflow-y-hidden overflow-x-hidden p-4" style="transform: translateX({profile === 'calc' ? 0 : profile === 'sync' ? 100 : -100}%);">
+    <div class="flex flex-col gap-y-4 w-full md:w-92">
       <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
         <div class="title">Instructions</div>
         <div class="flex flex-col gap-y-2">
@@ -991,7 +991,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] box">
+    <div class="flex flex-col gap-y-4 w-110 bg-[#1e1e1e] box md:h-full md:overflow-y-auto">
       <div class="flex flex-col gap-y-1">
         <div class="flex flex-row gap-x-1">
           <Display name="Temperature" min={323} max={20000} bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
@@ -1014,7 +1014,7 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-col gap-y-4 w-66">
+    <div class="flex flex-col gap-y-4 w-full md:w-66 md:h-full md:overflow-y-auto">
       <div class="flex flex-col bg-[#1e1e1e] box">
         <div class="flex flex-col gap-y-2">
           <Checkbox text="Turbines powering Primary grid?" labelClass="leading-none" bind:checked={turbsToPrimary} onchange={() => handleModify() } />
@@ -1055,11 +1055,11 @@
     </div>
   </div>
 
-  <div id="temp" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'temp' ? 0 : profile === 'scram' ? -100 : 100}vw);">
+  <div id="temp" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out overflow-x-hidden p-4" style="transform: translateX({profile === 'temp' ? 0 : profile === 'scram' ? -100 : 100}%);">
     <TemperatureCalculator />
   </div>
 
-  <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'scram' ? 0 : 100}vw);">
+  <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out overflow-x-hidden p-4" style="transform: translateX({profile === 'scram' ? 0 : 100}%);">
     <div class="flex justify-center items-center box px-4 py-2 text-orange-300">
       Currently unavailable
     </div>
@@ -1192,8 +1192,8 @@
     </div> -->
   </div>
 
-  <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'sync' ? 0 : -100}vw);">
-    <div class="flex flex-row gap-4 justify-center items-center">
+  <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out md:overflow-y-hidden overflow-x-hidden p-4" style="transform: translateX({profile === 'sync' ? 0 : -100}%);">
+    <div class="flex flex-row gap-4 justify-center items-center max-w-full overflow-x-auto">
       <div class="self-start">
         <Stack items={activeTurbineAnnouncements} />
       </div>
