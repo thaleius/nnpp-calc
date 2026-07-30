@@ -622,16 +622,18 @@
       preset: preset === -1 ? undefined : preset,
     };
 
-    const url = new URL(window.location.origin + window.location.pathname);
-
     const jsonString = JSON.stringify(json);
-    if (jsonString !== "{}") {
-      const compressed = LZString.compressToEncodedURIComponent(jsonString);
-      url.searchParams.append('s', compressed);
-    }
+    const targetPath = resolve('/calc/');
+    const url = new URL(targetPath, window.location.origin);
 
-    shareLink = url.toString();
-    goto(url.pathname + url.search, { 
+    if (jsonString !== '{}') {
+      url.searchParams.set('s', LZString.compressToEncodedURIComponent(jsonString));
+      shareLink = url.toString();
+    } else {
+      shareLink = '';
+    }
+    
+    goto(targetPath + url.search, { 
       replaceState: true, 
       keepFocus: true, 
       noScroll: true 
@@ -1035,9 +1037,11 @@
         </div>
       </div>
 
-      <Clipboard class="button focusring w-full" bind:value={shareLink} bind:success={shareLinkCopied}>
-        {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
-      </Clipboard>
+      {#if shareLink}
+        <Clipboard class="button focusring w-full" bind:value={shareLink} bind:success={shareLinkCopied}>
+          {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
+        </Clipboard>
+      {/if}
 
       {#if (notes.length > 0 || notesPre.length > 0)}
         <div class="flex flex-col bg-[#1e1e1e] box overflow-y-auto">
