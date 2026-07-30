@@ -1,6 +1,12 @@
 <script lang="ts">
-    import Checkbox from "./Checkbox.svelte";
+  import LZString from "lz-string";
+  import Checkbox from "./Checkbox.svelte";
   import Display from "./Display.svelte";
+  import { Clipboard } from "flowbite-svelte";
+  import { page } from "$app/state";
+  import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
+  import { untrack } from "svelte";
 
   let controlRodInsertion = $state(100);
   let fuelLevel = $state(100);
@@ -20,6 +26,74 @@
   let coolantCooling = $derived((feedwaterValves ? ((coolantValves.alpha ? 5 : 0) + (coolantValves.beta ? 5 : 0)) : 0) * (feedwaterLevel < 80 ? feedwaterLevel / 80 : 1));
 
   let tempROC = $derived(baseHeating + fuelHeating + (meltdown ? 18 : 0) - (controlRodCooling + feedwaterCooling + coolantCooling + (scram ? 21 : 0)));
+
+  let shareLink = $state('');
+  let shareLinkCopied = $state(false);
+
+  const getPath = () => page.params.path?.replace(/\//g, '');
+  $effect(() => {
+    const shareData = page.url.searchParams.get('s');
+
+    if (shareData) {
+      try {
+        const sharedConfig = untrack(() => LZString.decompressFromEncodedURIComponent(shareData));
+        console.log(sharedConfig)
+        if (sharedConfig) {
+          const json = JSON.parse(sharedConfig);
+          if (getPath() === 'temp') {
+            if (json.hasOwnProperty('cr'))
+              controlRodInsertion = json.cr;
+            if (json.hasOwnProperty('fuel'))
+              fuelLevel = json.fuel;
+            if (json.hasOwnProperty('fw'))
+              feedwaterLevel = json.fw;
+            if (json.hasOwnProperty('fwv'))
+              feedwaterValves = json.fwv;
+            if (json.hasOwnProperty('cv1'))
+              coolantValves.alpha = json.cv1;
+            if (json.hasOwnProperty('cv2'))
+              coolantValves.beta = json.cv2;
+            if (json.hasOwnProperty('md'))
+              meltdown = json.md;
+            if (json.hasOwnProperty('scram'))
+              scram = json.scram;
+          }
+        }
+      } catch (error) {
+        console.error('Error while decompressing share data:', error);
+      }
+    }
+  });
+
+  $effect(() => {
+    const json = {
+      cr: controlRodInsertion === 100 ? undefined : controlRodInsertion,
+      fuel: fuelLevel === 100 ? undefined : fuelLevel,
+      fw: feedwaterLevel === 100 ? undefined : feedwaterLevel,
+      fwv: feedwaterValves === true ? undefined : false,
+      cv1: coolantValves.alpha === true ? undefined : false,
+      cv2: coolantValves.beta === true ? undefined : false,
+      md: meltdown === false ? undefined : true,
+      scram: scram === false ? undefined : true
+    };
+
+    const jsonString = JSON.stringify(json);
+    const targetPath = resolve('/temp/');
+    const url = new URL(targetPath, window.location.origin);
+
+    if (jsonString !== '{}') {
+      url.searchParams.set('s', LZString.compressToEncodedURIComponent(jsonString));
+      shareLink = url.toString();
+    } else {
+      shareLink = '';
+    }
+
+    goto(targetPath + url.search, { 
+      replaceState: true, 
+      keepFocus: true, 
+      noScroll: true 
+    });
+  });
 </script>
 
 <div class="flex flex-row gap-4 justify-center items-center flex-wrap">
@@ -59,5 +133,10 @@
         }} />
       </div>
     </div>
+    {#if shareLink}
+      <Clipboard class="button focusring w-full" bind:value={shareLink} bind:success={shareLinkCopied}>
+        {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
+      </Clipboard>
+    {/if}
   </div>
 </div>
