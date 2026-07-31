@@ -1211,7 +1211,7 @@
           </div>
           <div class="flex flex-col gap-2 items-center w-64">
             <div class="flex flex-row gap-2 w-full">
-              <Display name="Temperature" min={500} max={3119} bind:value={temp.value} uncertainty={temp.uncertainty} showUncertainty={false} edit={true} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" compact onEdit={() => { if (!checked.tempEdit) checked.tempEdit = true; updateSelection('tempEdit', checked.tempEdit); }} />
+              <Display name="Temperature" min={0} max={3119} bind:value={temp.value} uncertainty={temp.uncertainty} showUncertainty={false} edit={true} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" compact onEdit={() => { if (!checked.tempEdit) checked.tempEdit = true; updateSelection('tempEdit', checked.tempEdit); }} />
               <Display name="Target RPM" min={0} max={4999} bind:value={targetRpm} edit={true} showUncertainty={false} decimals={0} unit="" inputClass="w-12" wrapperClass="text-orange-300 w-full" compact={true} />
             </div>
             <div class="flex flex-row gap-2 w-full">
