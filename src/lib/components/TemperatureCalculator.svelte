@@ -2,7 +2,7 @@
   import LZString from "lz-string";
   import Checkbox from "./Checkbox.svelte";
   import Display from "./Display.svelte";
-  import { Clipboard } from "flowbite-svelte";
+  import { Clipboard, Toggle } from "flowbite-svelte";
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -111,10 +111,10 @@
   <div class="flex flex-col gap-y-4 w-full md:w-70">
     <div class="flex flex-col box w-full">
       <div class="title">Coolants</div>
-      <div class="flex flex-col gap-y-1">
-        <Checkbox text="Feedwater valves" bind:checked={feedwaterValves} />
-        <Checkbox text="Coolant alpha" bind:checked={coolantValves.alpha} />
-        <Checkbox text="Coolant beta" bind:checked={coolantValves.beta} />
+      <div class="flex flex-col gap-y-2">
+        <Toggle bind:checked={feedwaterValves} class="text-md cursor-pointer">Feedwater valve</Toggle>
+        <Toggle bind:checked={coolantValves.alpha} class="text-md cursor-pointer">Coolant Alpha</Toggle>
+        <Toggle bind:checked={coolantValves.beta} class="text-md cursor-pointer">Coolant Beta</Toggle>
       </div>
     </div>
 
@@ -133,10 +133,10 @@
         }} />
       </div>
     </div>
-    {#if shareLink}
-      <Clipboard class="button focusring w-full" bind:value={shareLink} bind:success={shareLinkCopied}>
-        {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
-      </Clipboard>
-    {/if}
   </div>
 </div>
+{#if shareLink}
+  <Clipboard class="button focusring w-full md:w-80 absolute bottom-4" bind:value={shareLink} bind:success={shareLinkCopied}>
+    {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
+  </Clipboard>
+{/if}
