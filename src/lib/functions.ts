@@ -121,37 +121,32 @@ export function fw_flow_util_unc(fwUtil: number, dfwUtil: number, single: boolea
 }
 
 const s = 9;
-const u = (C6*s**(1/2))/s**2 - C7/s;
-const v = s - C7/2/u;
+const u = 40;
+const v = 8.777015329770778;
+const dv = 0.0022;
+const w = 6;
+
 export function vibration(fr: number) {
   if (fr < s)
     return C6*fr**(1/2)
-
-  if (fr > v)
-    return vibration(v);
   
-  return u*(fr-s)**2 + C7*(fr-s) + C6*s**(1/2);
+  return u*C6*(v-fr)/(w-fr);
 }
 
 export function vibration_unc(fr: number, dfr: number) {
+  if (fr == 0) return 0;
+
   if (fr < s) {
     const df_C6 = fr**(1/2) * dC6;
     const df_fr = (C6 / (2 * fr**(1/2))) * dfr;
     return (df_C6**2 + df_fr**2)**(1/2) * k;
   }
 
-  if (fr > v) {
-    return vibration_unc(v, 0);
-  }
+  const df_C6 =  u*(v-fr)/(w-fr) * dC6;
+  const df_v = u*C6/(w-fr) * dv;
+  const df_fr = u*C6*(w-v)/(w-fr)**2 * dfr;
 
-  const dx = fr - s;
-  const sqrt_s = s**(1/2);
-
-  const df_C6 = (dx**2 / (s * sqrt_s) + sqrt_s) * dC6;
-  const df_C7 = (dx - dx**2 / s) * dC7;
-  const df_fr = (2 * u * dx + C7) * dfr;
-
-  return (df_C6**2 + df_C7**2 + df_fr**2)**(1/2) * k;
+  return (df_C6**2 + df_v**2 + df_fr**2)**(1/2) * k;
 }
 
 export function rpm(fr: number) {
