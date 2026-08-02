@@ -19,7 +19,7 @@
   let meltdown = $state(false);
   let scram = $state(false);
 
-  const baseHeating = 6;
+  let baseHeating = $derived(fuelLevel === 0 ? -3 : 6);
   let fuelHeating = $derived(20 * (fuelLevel < 75 ? fuelLevel / 100 : 1));
   let controlRodCooling = $derived((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * controlRodInsertion / 100);
   let feedwaterCooling = $derived((feedwaterValves ? 5 : 0) * (feedwaterLevel < 80 ? feedwaterLevel / 80 : 1));
