@@ -97,6 +97,13 @@
 </script>
 
 <div class="flex flex-row gap-4 justify-center items-center flex-wrap">
+  <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box w-full md:w-70">
+    <div class="title">Instructions</div>
+    <div class="flex flex-col gap-y-2">
+      <p>Enter your custom values to run the calculation.</p>
+    </div>
+  </div>
+
   <div class="flex flex-col gap-y-1 box w-full md:w-70">
     <Display name="Control Rod insertion" bind:value={controlRodInsertion} min={0} max={100} compact decimals={0} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
     <Display name="Fuel level" bind:value={fuelLevel} min={0} max={100} compact decimals={1} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
