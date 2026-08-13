@@ -16,6 +16,12 @@
     alpha: true,
     beta: true
   });
+  let reliefValves = $state({
+    1: false,
+    2: false,
+    3: false,
+    4: false
+  });
   let meltdown = $state(false);
   let scram = $state(false);
 
@@ -24,8 +30,9 @@
   let controlRodCooling = $derived((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * controlRodInsertion / 100);
   let feedwaterCooling = $derived((feedwaterValves ? 5 : 0) * (feedwaterLevel < 80 ? feedwaterLevel / 80 : 1));
   let coolantCooling = $derived((feedwaterValves ? ((coolantValves.alpha ? 5 : 0) + (coolantValves.beta ? 5 : 0)) : 0) * (feedwaterLevel < 80 ? feedwaterLevel / 80 : 1));
+  let rvCooling = $derived(Object.values(reliefValves).reduce((partialSum, a) => partialSum + (a ? 7.5 : 0), 0));
 
-  let tempROC = $derived(baseHeating + fuelHeating + (meltdown ? 18 : 0) - (controlRodCooling + feedwaterCooling + coolantCooling + (scram ? 21 : 0)));
+  let tempROC = $derived(baseHeating + fuelHeating + (meltdown ? 18 : 0) - (controlRodCooling + feedwaterCooling + coolantCooling + rvCooling + (scram ? 21 : 0)));
 
   let shareLink = $state('');
   let shareLinkCopied = $state(false);
@@ -57,6 +64,14 @@
               meltdown = json.md;
             if (json.hasOwnProperty('scram'))
               scram = json.scram;
+            if (json.hasOwnProperty('rv1'))
+              reliefValves['1'] = json.rv1;
+            if (json.hasOwnProperty('rv2'))
+              reliefValves['2'] = json.rv2;
+            if (json.hasOwnProperty('rv3'))
+              reliefValves['3'] = json.rv3;
+            if (json.hasOwnProperty('rv4'))
+              reliefValves['4'] = json.rv4;
           }
         }
       } catch (error) {
@@ -74,7 +89,11 @@
       cv1: coolantValves.alpha === true ? undefined : false,
       cv2: coolantValves.beta === true ? undefined : false,
       md: meltdown === false ? undefined : true,
-      scram: scram === false ? undefined : true
+      scram: scram === false ? undefined : true,
+      rv1: reliefValves['1'] ? true : undefined,
+      rv2: reliefValves['2'] ? true : undefined,
+      rv3: reliefValves['3'] ? true : undefined,
+      rv4: reliefValves['4'] ? true : undefined
     };
 
     const jsonString = JSON.stringify(json);
@@ -94,6 +113,9 @@
       noScroll: true 
     });
   });
+
+  const activeClass = "bg-orange-300/10 border border-orange-300 text-orange-300";
+  const inactiveClass = "bg-[#161616] border border-[#3b3b3b] text-gray-400 hover:text-gray-200 hover:border-gray-500 hover:bg-[#252525] focus:outline-none";
 </script>
 
 <div class="flex flex-row gap-4 justify-center items-center flex-wrap">
@@ -111,7 +133,7 @@
     <Display name="Temperature Rate of Change"
       bind:value={tempROC} min={baseHeating + fuelHeating - ((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) + feedwaterCooling + coolantCooling)} max={44}
       compact decimals={2} edit={true} showUncertainty={false} unit="K/s" inputClass="w-18" onEdit={(e) => {
-      controlRodInsertion = (baseHeating + fuelHeating - (tempROC + feedwaterCooling + coolantCooling)) / (4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * 100
+      controlRodInsertion = (baseHeating + fuelHeating - (tempROC + feedwaterCooling + coolantCooling + rvCooling)) / (4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * 100
     }} />
   </div>
 
@@ -123,6 +145,27 @@
         <Toggle bind:checked={coolantValves.alpha} class="text-md cursor-pointer">Coolant Alpha</Toggle>
         <Toggle bind:checked={coolantValves.beta} class="text-md cursor-pointer">Coolant Beta</Toggle>
       </div>
+    </div>
+
+    <div class="flex flex-col box w-full">
+      <div class="title">Relief Valves</div>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+          <button class={`flex flex-col items-start p-3 rounded transition-colors cursor-pointer ${reliefValves['1'] ? activeClass : inactiveClass}`} onclick={() => reliefValves['1'] = !reliefValves['1']}>
+            <span class="text-s uppercase opacity-75 text-center w-full">RV 1</span>
+          </button>
+
+          <button class={`flex flex-col items-start p-3 rounded transition-colors cursor-pointer ${reliefValves['2'] ? activeClass : inactiveClass}`} onclick={() => reliefValves['2'] = !reliefValves['2']}>
+            <span class="text-s uppercase opacity-75 text-center w-full">RV 2</span>
+          </button>
+
+          <button class={`flex flex-col items-start p-3 rounded transition-colors cursor-pointer ${reliefValves['3'] ? activeClass : inactiveClass}`} onclick={() => reliefValves['3'] = !reliefValves['3']}>
+            <span class="text-s uppercase opacity-75 text-center w-full">RV 3</span>
+          </button>
+
+          <button class={`flex flex-col items-start p-3 rounded transition-colors cursor-pointer ${reliefValves['4'] ? activeClass : inactiveClass}`} onclick={() => reliefValves['4'] = !reliefValves['4']}>
+            <span class="text-s uppercase opacity-75 text-center w-full">RV 4</span>
+          </button>
+        </div>
     </div>
 
     <div class="flex flex-col box w-full">
