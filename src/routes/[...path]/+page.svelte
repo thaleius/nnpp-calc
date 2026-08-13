@@ -538,7 +538,7 @@
   });
 
   const activeClass = "bg-orange-300/10 border border-orange-300 text-orange-300";
-  const inactiveClass = "bg-[#161616] border border-[#3b3b3b] text-gray-400 hover:text-gray-200 hover:border-gray-500 hover:bg-[#252525] focus:outline-none focus:ring-1 focus:ring-orange-300";
+  const inactiveClass = "bg-[#161616] border border-[#3b3b3b] text-gray-400 hover:text-gray-200 hover:border-gray-500 hover:bg-[#252525] focus:outline-none";
 
   function resetChecked() {
     checked.tempEdit = false;
