@@ -1059,7 +1059,7 @@
     </div>
   </div>
 
-  <div id="temp" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out overflow-x-hidden p-4" style="transform: translateX({profile === 'temp' ? 0 : profile === 'scram' ? -100 : 100}%);">
+  <div id="temp" class="absolute inset-0 flex transition-transform duration-500 ease-in-out overflow-x-hidden" style="transform: translateX({profile === 'temp' ? 0 : profile === 'scram' ? -100 : 100}%);">
     <TemperatureCalculator />
   </div>
 
