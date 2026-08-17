@@ -8,7 +8,7 @@
   import { resolve } from "$app/paths";
   import { untrack } from "svelte";
 
-  let { shareLink = $bindable() }: { shareLink: string } = $props();
+  let { shareLink = $bindable(), activeProfile }: { shareLink: string, activeProfile: string } = $props();
 
   let controlRodInsertion = $state(100);
   let fuelLevel = $state(100);
@@ -80,6 +80,8 @@
   });
 
   $effect(() => {
+    if (activeProfile !== 'temp') return;
+
     const json = {
       cr: controlRodInsertion === 100 ? undefined : controlRodInsertion,
       fuel: fuelLevel === 100 ? undefined : fuelLevel,
