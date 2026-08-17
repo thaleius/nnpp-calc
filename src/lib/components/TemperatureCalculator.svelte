@@ -2,11 +2,13 @@
   import LZString from "lz-string";
   import Checkbox from "./Checkbox.svelte";
   import Display from "./Display.svelte";
-  import { Clipboard, Toggle } from "flowbite-svelte";
+  import { Toggle } from "flowbite-svelte";
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { untrack } from "svelte";
+
+  let { shareLink = $bindable() }: { shareLink: string } = $props();
 
   let controlRodInsertion = $state(100);
   let fuelLevel = $state(100);
@@ -33,9 +35,6 @@
   let rvCooling = $derived(Object.values(reliefValves).reduce((partialSum, a) => partialSum + (a ? 7.5 : 0), 0));
 
   let tempROC = $derived(baseHeating + fuelHeating + (meltdown ? 18 : 0) - (controlRodCooling + feedwaterCooling + coolantCooling + rvCooling + (scram ? 21 : 0)));
-
-  let shareLink = $state('');
-  let shareLinkCopied = $state(false);
 
   const getPath = () => page.params.path?.replace(/\//g, '');
   $effect(() => {
@@ -118,7 +117,7 @@
   const inactiveClass = "bg-[#161616] border border-[#3b3b3b] text-gray-400 hover:text-gray-200 hover:border-gray-500 hover:bg-[#252525] focus:outline-none";
 </script>
 
-<div class="flex flex-row gap-4 justify-center items-center flex-wrap p-4 w-full my-auto">
+<div class="flex flex-col md:flex-row gap-4 md:justify-center md:items-center md:flex-wrap w-full overflow-y-auto p-4 md:pb-0">
   <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box w-full md:w-70">
     <div class="title">Instructions</div>
     <div class="flex flex-col gap-y-2">
@@ -184,9 +183,4 @@
       </div>
     </div>
   </div>
-  {#if shareLink}
-    <Clipboard class="button focusring w-full md:w-80 md:absolute md:bottom-4" bind:value={shareLink} bind:success={shareLinkCopied}>
-      {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
-    </Clipboard>
-  {/if}
 </div>

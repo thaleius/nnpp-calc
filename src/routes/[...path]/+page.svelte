@@ -5,7 +5,7 @@
   import TurbineUtil from "$lib/components/TurbineUtil.svelte";
   import { dExc, dFR, dFRV, dT, excess_unc, FR, FR_power, FR_power_unc, FR_unc, FRV, FRV_unc, fw_flow, fw_flow_unc, fw_flow_util, fw_flow_util_unc, fw_util, fw_util_unc, power, power_unc, pressure, pressure_unc, rpm, rpm_unc, T, T_fwFlow, T_fwFlow_unc, T_unc, vibration, vibration_unc } from "$lib/functions";
   import { page } from '$app/state';
-  import { Clipboard } from "flowbite-svelte";
+  import { BottomNav, BottomNavItem, Clipboard } from "flowbite-svelte";
   import { PenSolid } from "flowbite-svelte-icons";
   import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
@@ -449,7 +449,7 @@
     }
   }
 
-  let shareLink = $state('');
+  let shareLink = $state({} as Record<profileType, string>);
   let shareLinkCopied = $state(false);
   $effect(() => {
     const shareData = untrack(() => page.url.searchParams.get('s'));
@@ -467,7 +467,6 @@
 
             connectShared();
           } else {
-            console.log(json)
             if (json.temp)
               temp.value = json.temp;
             if (json.excess)
@@ -628,9 +627,9 @@
 
     if (jsonString !== '{}') {
       url.searchParams.set('s', LZString.compressToEncodedURIComponent(jsonString));
-      shareLink = url.toString();
+      shareLink['calc'] = url.toString();
     } else {
-      shareLink = '';
+      shareLink['calc'] = '';
     }
     
     goto(targetPath + url.search, { 
@@ -946,320 +945,335 @@
 
   type profileType = 'calc' | 'scram' | 'sync' | 'temp';
   let profile = $state<profileType>(getPath() || 'calc');
-
+  
   $effect(() => {
     localStorage.setItem('profile', profile);
+  });
+
+  function handleProfileChange(newProfile: profileType) {
+    profile = newProfile;
     goto(resolve(`/${profile}/`), { 
       replaceState: true, 
       keepFocus: true, 
       noScroll: true 
     });
-  })
+  }
 </script>
 
-<div class="relative w-screen h-screen overflow-hidden">
-  <div id="calc" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out overflow-y-auto md:overflow-y-hidden overflow-x-hidden p-4" style="transform: translateX({profile === 'calc' ? 0 : profile === 'sync' ? 100 : -100}%);">
-    <div class="flex flex-col gap-y-4 w-full md:w-92">
-      <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
-        <div class="title">Instructions</div>
-        <div class="flex flex-col gap-y-2">
-          <p>To modify certain values, select one or multiple options in the <span class="font-bold">EDIT</span> section.</p>
-          <p>You may also choose from the presets below.</p>
-        </div>
-      </div>
-      <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
-        <div class="title">Calculation Presets</div>
-        <div class="grid grid-cols-2 gap-3 text-sm">
-          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 1 ? activeClass : inactiveClass}`} onclick={() => preset == 1 ? preset = -1 : preset = 1}>
-            <span class="text-xs uppercase opacity-75">Preset 01</span>
-            <span class="font-bold mt-1">Standard</span>
-          </button>
-
-          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 2 ? activeClass : inactiveClass}`} onclick={() => preset == 2 ? preset = -1 : preset = 2}>
-            <span class="text-xs uppercase opacity-60">Preset 02</span>
-            <span class="font-bold mt-1">POEA</span>
-          </button>
-
-          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 3 ? activeClass : inactiveClass}`} onclick={() => preset == 3 ? preset = -1 : preset = 3}>
-            <span class="text-xs uppercase opacity-60">Preset 03</span>
-            <span class="font-bold mt-1">Turbines</span>
-          </button>
-
-          <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 4 ? activeClass : inactiveClass}`} onclick={() => preset == 4 ? preset = -1 : preset = 4}>
-            <span class="text-xs uppercase opacity-60">Preset 04</span>
-            <span class="font-bold mt-1">POEA & Turbines</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-y-4 max-w-full md:w-110 bg-[#1e1e1e] box md:max-h-full md:overflow-y-auto">
-      <div class="flex flex-col gap-y-1">
-        <div class="flex flex-row gap-x-1">
-          <Display name="Temperature" min={0} max={20000} bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
-          <Display name="Pressure" min={101.3} max={101.3 + 6.53421059705648 * (20000 - 323)} bind:value={pres} uncertainty={pres_unc} decimals={1} unit="kPa" inputClass="w-24" wrapperClass="w-full" compact onEdit={handleModify} />
-        </div>
-        <Display name="Excess" min={0} max={2 * 5499 * (1/10 * Math.sqrt(6.53421059705648 * (20000 - 323)) - 3.61)} bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact onEdit={handleModify} />
-        <div class="flex flex-row gap-x-1">
-          <Display name="Feedwater Flow Rate" min={0} max={1/10 * Math.sqrt(6.53421059705648 * (20000 - 323))} bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} />
-          <Display name="Feedwater Utilization" min={0} max={100} bind:value={feedwater_util.value} uncertainty={feedwater_util.uncertainty} bind:edit={checked.fwUtilEdit} decimals={1} unit="%" inputClass="w-16" wrapperClass="w-full" compact onEdit={handleModify} />
-        </div>
-      </div>
-      <div class="flex gap-x-1 [&>div]:w-1/2">
-        <div>
-          <div class="title text-center">Turbine 1</div>
-          <TurbineUtil onEdit={() => { handleModify(); handleEdit(1); }} bind:fr={flowRate1} bind:frEdit={checked.frEdit} bind:frv={flowRateValve1} bind:frvEdit={checked.frvEdit} bind:rpm={rpm1} bind:output={powerOutput1} vibration={vibration1} bind:outEdit={checked.outEdit} />
-        </div>
-        <div>
-          <div class="title text-center">Turbine 2</div>
-          <TurbineUtil onEdit={() => { handleModify(); handleEdit(2); }} bind:fr={flowRate2} bind:frEdit={checked.frEdit} bind:frv={flowRateValve2} bind:frvEdit={checked.frvEdit} bind:rpm={rpm2} bind:output={powerOutput2} vibration={vibration2} bind:outEdit={checked.outEdit} />
-        </div>
-      </div>
-    </div>
-    <div class="flex flex-col justify-center gap-y-4 w-full md:w-66 md:h-full md:overflow-y-auto">
-      <div class="flex flex-col bg-[#1e1e1e] box">
-        <div class="flex flex-col gap-y-2">
-          <Checkbox text="Turbines powering Primary grid?" labelClass="leading-none" bind:checked={turbsToPrimary} onchange={() => handleModify() } />
-          <Checkbox text="One feedwater pump unavailable?" labelClass="leading-none" bind:checked={singleFWpump} onchange={() => handleModify() }  />
-        </div>
-      </div>
-
-      <div class="flex flex-col bg-[#1e1e1e] box">
-        <div class="title">Edit</div>
-        <div class="flex flex-col gap-y-4 leading-none">
-          <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => { handleModify(); updateSelection('tempEdit', e.currentTarget.checked); }} />
-          <Checkbox text="Excess" bind:checked={checked.excEdit} onchange={(e) => { handleModify(); updateSelection('excEdit', e.currentTarget.checked) }} />
-          <Checkbox text="Feedwater Flow Rate" bind:checked={checked.fwFlowEdit} onchange={(e) => { handleModify(); updateSelection('fwFlowEdit', e.currentTarget.checked) }} />
-          <Checkbox text="Feedwater Util." bind:checked={checked.fwUtilEdit} onchange={(e) => { handleModify(); updateSelection('fwUtilEdit', e.currentTarget.checked) }} />
-          <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => { handleModify(); updateSelection('frvEdit', e.currentTarget.checked) }} />
-          <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => { handleModify(); updateSelection('frEdit', e.currentTarget.checked) }} />
-          <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => { handleModify(); updateSelection('outEdit', e.currentTarget.checked) }} />
-        </div>
-      </div>
-
-      {#if shareLink}
-        <Clipboard class="button focusring w-full" bind:value={shareLink} bind:success={shareLinkCopied}>
-          {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
-        </Clipboard>
-      {/if}
-
-      {#if (notes.length > 0 || notesPre.length > 0)}
-        <div class="flex flex-col bg-[#1e1e1e] box overflow-y-auto">
-          <div class="title">Notes</div>
-          <div class="flex flex-col gap-y-1">
-            {#each notesPre as note}
-              <span>{note}</span>
-            {/each}
-            {#each notes as note}
-              <span>{@html note}</span>
-            {/each}
+<div class="flex flex-col w-screen h-screen overflow-hidden md:justify-center md:items-center">
+  <div class="relative flex flex-1 min-h-0 w-full">
+    <div id="calc" class="absolute overflow-y-auto w-full h-full flex flex-col md:flex-row md:flex-wrap gap-4 md:justify-center md:items-center p-4 transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'calc' ? 0 : profile === 'sync' ? 100 : -100}%);">
+      <div class="flex flex-col gap-y-4 w-full md:w-92">
+        <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
+          <div class="title">Instructions</div>
+          <div class="flex flex-col gap-y-2">
+            <p>To modify certain values, select one or multiple options in the <span class="font-bold">EDIT</span> section.</p>
+            <p>You may also choose from the presets below.</p>
           </div>
         </div>
-      {/if}
-    </div>
-  </div>
-
-  <div id="temp" class="absolute inset-0 flex transition-transform duration-500 ease-in-out overflow-x-hidden" style="transform: translateX({profile === 'temp' ? 0 : profile === 'scram' ? -100 : 100}%);">
-    <TemperatureCalculator />
-  </div>
-
-  <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out overflow-x-hidden p-4" style="transform: translateX({profile === 'scram' ? 0 : 100}%);">
-    <div class="flex justify-center items-center box px-4 py-2 text-orange-300">
-      Currently unavailable
-    </div>
-    <!-- <div class="flex flex-row gap-4 justify-center items-center">
-      <div class="self-start">
-        <Stack items={activeAnnouncements} />
-      </div>
-
-      <div class="box">
-        <Chart {props} bind:isPlaying={isPlaying} bind:currentSimTime={currentSimTime} bind:currentTemp={temp.value} class="w-200 h-150" />
-      </div>
-
-      <div class="flex flex-col gap-y-4 w-80">
-        {#if isOwner}
-        <div class="box">
-          <div class="title">
-            Session
-          </div>
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <PenSolid class="shrink-0 h-6 w-6 text-orange-300" /><input type="url" placeholder="Server" bind:value={inputUrl} />
-            </div>
-            <button onclick={() => {
-              if (connectionStatus) {
-                socket.io.disconnect();
-              } else {
-                if (inputUrl) {
-                  socketUrl = inputUrl;
-                }
-                if (socketUrl) {
-                  localStorage.setItem('socketUrl', socketUrl);
-                  socket = new Socket(socketUrl);
-                  connect();
-                }
-              }
-            }} class="button w-full">
-              {#if connectionStatus}Disconnect{:else}Connect{/if}
+        <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
+          <div class="title">Calculation Presets</div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 1 ? activeClass : inactiveClass}`} onclick={() => preset == 1 ? preset = -1 : preset = 1}>
+              <span class="text-xs uppercase opacity-75">Preset 01</span>
+              <span class="font-bold mt-1">Standard</span>
             </button>
-            {#if connectionStatus && authUrl !== ''}
-            <div>
-              <a class="button w-full" about="_blank" href={authUrl}>
-                Authorize
-              </a>
-            </div>
-            {/if}
+
+            <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 2 ? activeClass : inactiveClass}`} onclick={() => preset == 2 ? preset = -1 : preset = 2}>
+              <span class="text-xs uppercase opacity-60">Preset 02</span>
+              <span class="font-bold mt-1">POEA</span>
+            </button>
+
+            <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 3 ? activeClass : inactiveClass}`} onclick={() => preset == 3 ? preset = -1 : preset = 3}>
+              <span class="text-xs uppercase opacity-60">Preset 03</span>
+              <span class="font-bold mt-1">Turbines</span>
+            </button>
+
+            <button class={`flex flex-col items-start p-3 rounded transition-colors text-left cursor-pointer ${preset === 4 ? activeClass : inactiveClass}`} onclick={() => preset == 4 ? preset = -1 : preset = 4}>
+              <span class="text-xs uppercase opacity-60">Preset 04</span>
+              <span class="font-bold mt-1">POEA & Turbines</span>
+            </button>
           </div>
         </div>
-        {/if}
+      </div>
 
-        <div class="box flex flex-col">
-          <div class="title">
-            Animation
+      <div class="flex flex-col gap-y-4 max-w-full md:w-110 bg-[#1e1e1e] box md:max-h-full md:overflow-y-auto">
+        <div class="flex flex-col gap-y-1">
+          <div class="flex flex-row gap-x-1">
+            <Display name="Temperature" min={0} max={20000} bind:value={temp.value} uncertainty={temp.uncertainty} bind:edit={checked.tempEdit} decimals={1} unit="K" inputClass="w-22" wrapperClass="w-full" compact onEdit={handleModify} />
+            <Display name="Pressure" min={101.3} max={101.3 + 6.53421059705648 * (20000 - 323)} bind:value={pres} uncertainty={pres_unc} decimals={1} unit="kPa" inputClass="w-24" wrapperClass="w-full" compact onEdit={handleModify} />
           </div>
-          <div class="flex flex-col gap-2 items-center">
-            {#if isOwner}<Checkbox text="No fuel" bind:checked={noFuel} />{/if}
-            <div class="flex flex-row gap-2 w-full">
-              <Display name="SCRAM temp" compact showUncertainty={false} edit={isOwner} bind:value={scramTemp} decimals={0} unit="K" inputClass="w-12" wrapperClass="text-orange-300 w-full" />
-              {#if isOwner}<button onclick={loadData} class="button w-full">Confirm</button>{/if}
+          <Display name="Excess" min={0} max={2 * 5499 * (1/10 * Math.sqrt(6.53421059705648 * (20000 - 323)) - 3.61)} bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact onEdit={handleModify} />
+          <div class="flex flex-row gap-x-1">
+            <Display name="Feedwater Flow Rate" min={0} max={1/10 * Math.sqrt(6.53421059705648 * (20000 - 323))} bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} />
+            <Display name="Feedwater Utilization" min={0} max={100} bind:value={feedwater_util.value} uncertainty={feedwater_util.uncertainty} bind:edit={checked.fwUtilEdit} decimals={1} unit="%" inputClass="w-16" wrapperClass="w-full" compact onEdit={handleModify} />
+          </div>
+        </div>
+        <div class="flex gap-x-1 [&>div]:w-1/2">
+          <div>
+            <div class="title text-center">Turbine 1</div>
+            <TurbineUtil onEdit={() => { handleModify(); handleEdit(1); }} bind:fr={flowRate1} bind:frEdit={checked.frEdit} bind:frv={flowRateValve1} bind:frvEdit={checked.frvEdit} bind:rpm={rpm1} bind:output={powerOutput1} vibration={vibration1} bind:outEdit={checked.outEdit} />
+          </div>
+          <div>
+            <div class="title text-center">Turbine 2</div>
+            <TurbineUtil onEdit={() => { handleModify(); handleEdit(2); }} bind:fr={flowRate2} bind:frEdit={checked.frEdit} bind:frv={flowRateValve2} bind:frvEdit={checked.frvEdit} bind:rpm={rpm2} bind:output={powerOutput2} vibration={vibration2} bind:outEdit={checked.outEdit} />
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col justify-center gap-y-4 w-full md:w-66 md:h-full md:overflow-y-auto">
+        <div class="flex flex-col bg-[#1e1e1e] box">
+          <div class="flex flex-col gap-y-2">
+            <Checkbox text="Turbines powering Primary grid?" labelClass="leading-none" bind:checked={turbsToPrimary} onchange={() => handleModify() } />
+            <Checkbox text="One feedwater pump unavailable?" labelClass="leading-none" bind:checked={singleFWpump} onchange={() => handleModify() }  />
+          </div>
+        </div>
+
+        <div class="flex flex-col bg-[#1e1e1e] box">
+          <div class="title">Edit</div>
+          <div class="flex flex-col gap-y-4 leading-none">
+            <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => { handleModify(); updateSelection('tempEdit', e.currentTarget.checked); }} />
+            <Checkbox text="Excess" bind:checked={checked.excEdit} onchange={(e) => { handleModify(); updateSelection('excEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Feedwater Flow Rate" bind:checked={checked.fwFlowEdit} onchange={(e) => { handleModify(); updateSelection('fwFlowEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Feedwater Util." bind:checked={checked.fwUtilEdit} onchange={(e) => { handleModify(); updateSelection('fwUtilEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => { handleModify(); updateSelection('frvEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => { handleModify(); updateSelection('frEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => { handleModify(); updateSelection('outEdit', e.currentTarget.checked) }} />
+          </div>
+        </div>
+
+        {#if (notes.length > 0 || notesPre.length > 0)}
+          <div class="flex flex-col bg-[#1e1e1e] box md:overflow-y-auto">
+            <div class="title">Notes</div>
+            <div class="flex flex-col gap-y-1">
+              {#each notesPre as note}
+                <span>{note}</span>
+              {/each}
+              {#each notes as note}
+                <span>{@html note}</span>
+              {/each}
             </div>
-            <div class="flex flex-row gap-2 w-full">
-              <Display name="Current temp" compact showUncertainty={false} edit={false} value={temp.value} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
-              <Display name="Time" compact showUncertainty={false} edit={isOwner} bind:value={currentSimTime} decimals={1} unit="s" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
+          </div>
+        {/if}
+      </div>
+    </div>
+
+    <div id="temp" class="absolute inset-0 w-full h-full flex transition-transform duration-500 ease-in-out" style="transform: translateX({profile === 'temp' ? 0 : profile === 'scram' ? -100 : 100}%);">
+      <TemperatureCalculator bind:shareLink={shareLink['temp']} />
+    </div>
+
+    <div id="scram" class="absolute inset-0 flex justify-center items-center transition-transform duration-500 ease-in-out overflow-x-hidden p-4" style="transform: translateX({profile === 'scram' ? 0 : 100}%);">
+      <div class="flex justify-center items-center box px-4 py-2 text-orange-300">
+        Currently unavailable
+      </div>
+      <!-- <div class="flex flex-row gap-4 justify-center items-center">
+        <div class="self-start">
+          <Stack items={activeAnnouncements} />
+        </div>
+
+        <div class="box">
+          <Chart {props} bind:isPlaying={isPlaying} bind:currentSimTime={currentSimTime} bind:currentTemp={temp.value} class="w-200 h-150" />
+        </div>
+
+        <div class="flex flex-col gap-y-4 w-80">
+          {#if isOwner}
+          <div class="box">
+            <div class="title">
+              Session
             </div>
-            {#if isOwner}
-            <div class="flex flex-row gap-2 w-full">
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <PenSolid class="shrink-0 h-6 w-6 text-orange-300" /><input type="url" placeholder="Server" bind:value={inputUrl} />
+              </div>
               <button onclick={() => {
-                if (currentSimTime < endTime) {
-                  isPlaying = !isPlaying;
+                if (connectionStatus) {
+                  socket.io.disconnect();
+                } else {
+                  if (inputUrl) {
+                    socketUrl = inputUrl;
+                  }
+                  if (socketUrl) {
+                    localStorage.setItem('socketUrl', socketUrl);
+                    socket = new Socket(socketUrl);
+                    connect();
+                  }
+                }
+              }} class="button w-full">
+                {#if connectionStatus}Disconnect{:else}Connect{/if}
+              </button>
+              {#if connectionStatus && authUrl !== ''}
+              <div>
+                <a class="button w-full" about="_blank" href={authUrl}>
+                  Authorize
+                </a>
+              </div>
+              {/if}
+            </div>
+          </div>
+          {/if}
+
+          <div class="box flex flex-col">
+            <div class="title">
+              Animation
+            </div>
+            <div class="flex flex-col gap-2 items-center">
+              {#if isOwner}<Checkbox text="No fuel" bind:checked={noFuel} />{/if}
+              <div class="flex flex-row gap-2 w-full">
+                <Display name="SCRAM temp" compact showUncertainty={false} edit={isOwner} bind:value={scramTemp} decimals={0} unit="K" inputClass="w-12" wrapperClass="text-orange-300 w-full" />
+                {#if isOwner}<button onclick={loadData} class="button w-full">Confirm</button>{/if}
+              </div>
+              <div class="flex flex-row gap-2 w-full">
+                <Display name="Current temp" compact showUncertainty={false} edit={false} value={temp.value} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
+                <Display name="Time" compact showUncertainty={false} edit={isOwner} bind:value={currentSimTime} decimals={1} unit="s" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
+              </div>
+              {#if isOwner}
+              <div class="flex flex-row gap-2 w-full">
+                <button onclick={() => {
+                  if (currentSimTime < endTime) {
+                    isPlaying = !isPlaying;
+                    update();
+                  }
+                }} class="button w-full">
+                  {isPlaying ? 'Pause' : currentSimTime > startTime ? 'Continue' : 'Start'}
+                </button>
+                
+                <button onclick={() => { {
+                  isPlaying = false;
+                  currentSimTime = startTime;
+
+                  playedAnnouncements.clear();
+                  window.speechSynthesis.cancel();
+
                   update();
-                }
-              }} class="button w-full">
-                {isPlaying ? 'Pause' : currentSimTime > startTime ? 'Continue' : 'Start'}
-              </button>
-              
-              <button onclick={() => { {
-                isPlaying = false;
-                currentSimTime = startTime;
-
-                playedAnnouncements.clear();
-                window.speechSynthesis.cancel();
-
-                update();
-              }}} class="button w-full">
-                Reset
-              </button>
+                }}} class="button w-full">
+                  Reset
+                </button>
+              </div>
+              {/if}
             </div>
-            {/if}
           </div>
-        </div>
-        {#if shareLinkScram}
-          <Clipboard class="button focusring w-full" bind:value={shareLinkScram} bind:success={shareLinkScramCopied}>
-            {#if shareLinkScramCopied}Link copied to Clipboard{:else}Share configuration{/if}
-          </Clipboard>
-        {/if}
-        {#if userList.length > 0}
-        <div class="flex flex-col box">
-          <div class="title">Users</div>
-          <div class="flex flex-col gap-2">
-            {#each userList as user}
-            <span>{user}</span>
-            {/each}
-          </div>
-        </div>
-        {/if}
-        {#if !isOwner && !audioUnlocked}
-        <div class="box flex flex-col">
-          <div class="title">Audio</div>
-          <button onclick={() => {
-            audioUnlocked = true;
-            window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
-          }} class="button w-full">
-            Sprachausgabe aktivieren
-          </button>
-        </div>
-        {/if}
-        {#if shared}
-        <div class="box flex flex-col">
-          <div class="title">Share</div>
-          <button onclick={() => {
-            socket.io.disconnect();
-
-            reset();
-            loadData();
-          }} class="button w-full">
-            Reset
-          </button>
-        </div>
-        {/if}
-      </div>
-    </div> -->
-  </div>
-
-  <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out md:overflow-y-hidden overflow-x-hidden p-4" style="transform: translateX({profile === 'sync' ? 0 : -100}%);">
-    <div class="flex flex-row gap-4 justify-center items-center max-w-full overflow-x-auto">
-      <div class="self-start">
-        <Stack items={activeTurbineAnnouncements} />
-      </div>
-      <div class="flex flex-col gap-y-2 box">
-        <TurbineSim temp={temp.value} bind:currentRpm={currentRpm} bind:currentFR={currentFR} bind:currentFRVState={frvState} targetRpm={targetRpm} bind:optimalSwitchTime={optimalSwitchTime} bind:currentSimTime={turbineSimCurrentSimTime} bind:valveEndTime={turbineSimValveEndTime} bind:isPlaying={turbineSimIsPlaying}  class="w-200 h-150" />
-      </div>
-      <div class="flex flex-col gap-y-4">
-        <div class="box flex flex-col">
-          <div class="title">
-            Animation
-          </div>
-          <div class="flex flex-col gap-2 items-center w-64">
-            <div class="flex flex-row gap-2 w-full">
-              <Display name="Temperature" min={0} max={3119} bind:value={temp.value} uncertainty={temp.uncertainty} showUncertainty={false} edit={true} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" compact onEdit={() => { if (!checked.tempEdit) checked.tempEdit = true; updateSelection('tempEdit', checked.tempEdit); }} />
-              <Display name="Target RPM" min={0} max={4999} bind:value={targetRpm} edit={true} showUncertainty={false} decimals={0} unit="" inputClass="w-12" wrapperClass="text-orange-300 w-full" compact={true} />
+          {#if shareLinkScram}
+            <Clipboard class="button focusring w-full" bind:value={shareLinkScram} bind:success={shareLinkScramCopied}>
+              {#if shareLinkScramCopied}Link copied to Clipboard{:else}Share configuration{/if}
+            </Clipboard>
+          {/if}
+          {#if userList.length > 0}
+          <div class="flex flex-col box">
+            <div class="title">Users</div>
+            <div class="flex flex-col gap-2">
+              {#each userList as user}
+              <span>{user}</span>
+              {/each}
             </div>
-            <div class="flex flex-row gap-2 w-full">
-              <Display onEdit={() => turbineInputTime = turbineSimCurrentSimTime} name="Time" compact showUncertainty={false} edit={true} bind:value={turbineSimCurrentSimTime} decimals={1} unit="s" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
-            </div>
-            <div class="flex flex-row gap-2 w-full">
-              <button onclick={() => {
-                if (turbineSimCurrentSimTime < turbineSimValveEndTime + 10) {
-                  turbineSimIsPlaying = !turbineSimIsPlaying;
-                }
-              }} class="button w-full">
-                {turbineSimIsPlaying ? 'Pause' : turbineSimCurrentSimTime > turbineInputTime ? 'Continue' : 'Start'}
-              </button>
-              
-              <button onclick={() => { {
-                turbineSimIsPlaying = false;
-                turbineSimCurrentSimTime = turbineInputTime > 0 ? -15 : turbineInputTime;
+          </div>
+          {/if}
+          {#if !isOwner && !audioUnlocked}
+          <div class="box flex flex-col">
+            <div class="title">Audio</div>
+            <button onclick={() => {
+              audioUnlocked = true;
+              window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+            }} class="button w-full">
+              Sprachausgabe aktivieren
+            </button>
+          </div>
+          {/if}
+          {#if shared}
+          <div class="box flex flex-col">
+            <div class="title">Share</div>
+            <button onclick={() => {
+              socket.io.disconnect();
 
-                playedTurbineAnnouncements.clear();
-                window.speechSynthesis.cancel();
-              }}} class="button w-full">
-                Reset
-              </button>
+              reset();
+              loadData();
+            }} class="button w-full">
+              Reset
+            </button>
+          </div>
+          {/if}
+        </div>
+      </div> -->
+    </div>
+
+    <div id="sync" class="absolute inset-0 flex flex-row flex-wrap gap-4 justify-center items-center transition-transform duration-500 ease-in-out md:overflow-y-hidden overflow-x-hidden p-4" style="transform: translateX({profile === 'sync' ? 0 : -100}%);">
+      <div class="flex flex-row gap-4 justify-center items-center max-w-full overflow-x-auto">
+        <div class="self-start">
+          <Stack items={activeTurbineAnnouncements} />
+        </div>
+        <div class="flex flex-col gap-y-2 box">
+          <TurbineSim temp={temp.value} bind:currentRpm={currentRpm} bind:currentFR={currentFR} bind:currentFRVState={frvState} targetRpm={targetRpm} bind:optimalSwitchTime={optimalSwitchTime} bind:currentSimTime={turbineSimCurrentSimTime} bind:valveEndTime={turbineSimValveEndTime} bind:isPlaying={turbineSimIsPlaying}  class="w-200 h-150" />
+        </div>
+        <div class="flex flex-col gap-y-4">
+          <div class="box flex flex-col">
+            <div class="title">
+              Animation
+            </div>
+            <div class="flex flex-col gap-2 items-center w-64">
+              <div class="flex flex-row gap-2 w-full">
+                <Display name="Temperature" min={0} max={3119} bind:value={temp.value} uncertainty={temp.uncertainty} showUncertainty={false} edit={true} decimals={1} unit="K" inputClass="w-18" wrapperClass="text-orange-300 w-full" compact onEdit={() => { if (!checked.tempEdit) checked.tempEdit = true; updateSelection('tempEdit', checked.tempEdit); }} />
+                <Display name="Target RPM" min={0} max={4999} bind:value={targetRpm} edit={true} showUncertainty={false} decimals={0} unit="" inputClass="w-12" wrapperClass="text-orange-300 w-full" compact={true} />
+              </div>
+              <div class="flex flex-row gap-2 w-full">
+                <Display onEdit={() => turbineInputTime = turbineSimCurrentSimTime} name="Time" compact showUncertainty={false} edit={true} bind:value={turbineSimCurrentSimTime} decimals={1} unit="s" inputClass="w-18" wrapperClass="text-orange-300 w-full" />
+              </div>
+              <div class="flex flex-row gap-2 w-full">
+                <button onclick={() => {
+                  if (turbineSimCurrentSimTime < turbineSimValveEndTime + 10) {
+                    turbineSimIsPlaying = !turbineSimIsPlaying;
+                  }
+                }} class="button w-full">
+                  {turbineSimIsPlaying ? 'Pause' : turbineSimCurrentSimTime > turbineInputTime ? 'Continue' : 'Start'}
+                </button>
+                
+                <button onclick={() => { {
+                  turbineSimIsPlaying = false;
+                  turbineSimCurrentSimTime = turbineInputTime > 0 ? -15 : turbineInputTime;
+
+                  playedTurbineAnnouncements.clear();
+                  window.speechSynthesis.cancel();
+                }}} class="button w-full">
+                  Reset
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  {#if profile === 'calc' || profile === 'sync' || profile === 'temp'}
-  <!-- right button -->
-  <button 
-    class={`absolute top-1/2 right-8 translate-x-1/2 rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg`}
-    onclick={() => profile = profile === 'calc' ? 'temp' : profile === 'temp' ? 'scram' : 'calc'}
-  >
-    {profile === 'calc' ? 'Temperature Calculator' : profile === 'temp' ? 'Scram Calculator' : 'Calculator'}
-  </button>
+    {#if profile === 'calc' || profile === 'sync' || profile === 'temp'}
+      <!-- right button -->
+      <button 
+        class={`absolute top-1/2 right-8 translate-x-1/2 rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg hidden md:block`}
+        onclick={() => handleProfileChange(profile === 'calc' ? 'temp' : profile === 'temp' ? 'scram' : 'calc')}
+      >
+        {profile === 'calc' ? 'Temperature Calculator' : profile === 'temp' ? 'Scram Calculator' : 'Calculator'}
+      </button>
+      {/if}
+      {#if profile === 'calc' || profile === 'scram' || profile === 'temp'}
+      <!-- left button -->
+      <button 
+        class={`absolute top-1/2 left-8 -translate-x-1/2 -rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg hidden md:block`}
+        onclick={() => handleProfileChange(profile === 'calc' ? 'sync' : profile === 'scram' ? 'temp' : 'calc')}
+      >
+        {profile === 'calc' ? 'Turbine Sync Calculator' : profile === 'scram' ? 'Temperature Calculator' : 'Calculator'}
+      </button>
+    {/if}
+  </div>
+  {#if shareLink[profile]}
+    <div class="p-2 pt-0 md:p-0 w-full md:w-80 md:absolute md:bottom-4">
+      <Clipboard class="button w-full focusring" bind:value={shareLink[profile]} bind:success={shareLinkCopied}>
+        {#if shareLinkCopied}Link copied to Clipboard{:else}Share configuration{/if}
+      </Clipboard>
+    </div>
   {/if}
-  {#if profile === 'calc' || profile === 'scram' || profile === 'temp'}
-  <!-- left button -->
-  <button 
-    class={`absolute top-1/2 left-8 -translate-x-1/2 -rotate-90 -translate-y-1/2 whitespace-nowrap z-50 px-6 py-2 button font-bold shadow-lg`}
-    onclick={() => profile = profile === 'calc' ? 'sync' : profile === 'scram' ? 'temp' : 'calc'}
-  >
-    {profile === 'calc' ? 'Turbine Sync Calculator' : profile === 'scram' ? 'Temperature Calculator' : 'Calculator'}
-  </button>
-  {/if}
+  <div class="block md:hidden">
+    <BottomNav class="border-[#3b3b3b] dark:border-[#3b3b3b] border-t-2 relative" classes={{ inner: "grid-cols-4 text-wrap text-center bg-[#1e1e1e]" }} activeClass="font-bold text-orange-300 hover:text-green-900 dark:hover:text-green-700">
+      <BottomNavItem active={profile === 'sync'} onclick={() => handleProfileChange('sync')}>Turbine Sync</BottomNavItem>
+      <BottomNavItem active={profile === 'calc'} onclick={() => handleProfileChange('calc')}>Turbine Calc</BottomNavItem>
+      <BottomNavItem active={profile === 'temp'} onclick={() => handleProfileChange('temp')}>Temp</BottomNavItem>
+      <BottomNavItem active={profile === 'scram'} onclick={() => handleProfileChange('scram')}>SCRAM Calc</BottomNavItem>
+    </BottomNav>
+  </div>
 </div>
 
 <style lang="postcss">
