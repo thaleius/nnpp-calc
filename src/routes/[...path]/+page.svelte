@@ -1005,7 +1005,7 @@
           </div>
           <Display name="Excess" min={0} max={2 * 5499 * (1/10 * Math.sqrt(6.53421059705648 * (20000 - 323)) - 3.61)} bind:value={excess.value} uncertainty={excess.uncertainty} bind:edit={checked.excEdit} decimals={1} unit="kW" inputClass="w-26" compact onEdit={handleModify} />
           <div class="flex flex-row gap-x-1">
-            <Display name="Feedwater Flow Rate" min={0} max={1/10 * Math.sqrt(6.53421059705648 * (20000 - 323))} bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} />
+            <Display name="Feedwater Demand" min={0} max={1/10 * Math.sqrt(6.53421059705648 * (20000 - 323))} bind:value={feedwater_flow.value} uncertainty={feedwater_flow.uncertainty} bind:edit={checked.fwFlowEdit} decimals={2} unit="m³/s" inputClass="w-12" wrapperClass="w-full" compact onEdit={handleModify} />
             <Display name="Feedwater Utilization" min={0} max={100} bind:value={feedwater_util.value} uncertainty={feedwater_util.uncertainty} bind:edit={checked.fwUtilEdit} decimals={1} unit="%" inputClass="w-16" wrapperClass="w-full" compact onEdit={handleModify} />
           </div>
         </div>
@@ -1033,7 +1033,7 @@
           <div class="flex flex-col gap-y-4 leading-none">
             <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => { handleModify(); updateSelection('tempEdit', e.currentTarget.checked); }} />
             <Checkbox text="Excess" bind:checked={checked.excEdit} onchange={(e) => { handleModify(); updateSelection('excEdit', e.currentTarget.checked) }} />
-            <Checkbox text="Feedwater Flow Rate" bind:checked={checked.fwFlowEdit} onchange={(e) => { handleModify(); updateSelection('fwFlowEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Feedwater Demand" bind:checked={checked.fwFlowEdit} onchange={(e) => { handleModify(); updateSelection('fwFlowEdit', e.currentTarget.checked) }} />
             <Checkbox text="Feedwater Util." bind:checked={checked.fwUtilEdit} onchange={(e) => { handleModify(); updateSelection('fwUtilEdit', e.currentTarget.checked) }} />
             <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => { handleModify(); updateSelection('frvEdit', e.currentTarget.checked) }} />
             <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => { handleModify(); updateSelection('frEdit', e.currentTarget.checked) }} />
