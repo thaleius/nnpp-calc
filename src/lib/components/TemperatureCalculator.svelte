@@ -29,7 +29,7 @@
 
   let baseHeating = $derived(fuelLevel === 0 ? -3 : 6);
   let fuelHeating = $derived(20 * (fuelLevel < 75 ? fuelLevel / 100 : 1));
-  let controlRodCooling = $derived((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * controlRodInsertion / 100);
+  let controlRodCooling = $derived(fuelLevel === 0 ? 0 : ((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * controlRodInsertion / 100));
   let feedwaterCooling = $derived((feedwaterValves ? 5 : 0) * (feedwaterLevel < 80 ? feedwaterLevel / 80 : 1));
   let coolantCooling = $derived((feedwaterValves ? ((coolantValves.alpha ? 5 : 0) + (coolantValves.beta ? 5 : 0)) : 0) * (feedwaterLevel < 80 ? feedwaterLevel / 80 : 1));
   let rvCooling = $derived(Object.values(reliefValves).reduce((partialSum, a) => partialSum + (a ? 7.5 : 0), 0));
@@ -134,7 +134,11 @@
     <Display name="Temperature Rate of Change"
       bind:value={tempROC} min={baseHeating + fuelHeating - ((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) + feedwaterCooling + coolantCooling)} max={44}
       compact decimals={2} edit={true} showUncertainty={false} unit="K/s" inputClass="w-18" onEdit={(e) => {
-      controlRodInsertion = (baseHeating + fuelHeating - (tempROC + feedwaterCooling + coolantCooling + rvCooling)) / (4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * 100
+        if (fuelLevel === 0) {
+          return
+        }
+        
+        controlRodInsertion = (baseHeating + fuelHeating - (tempROC + feedwaterCooling + coolantCooling + rvCooling)) / (4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * 100
     }} />
   </div>
 
