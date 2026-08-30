@@ -256,9 +256,9 @@
         let po1 = power(fr1);
         let po2 = power(fr2);
 
-        currentNotes.push("This combination yields accurate results only if the resulting temperature is above 423&nbsp;K.");
+        currentNotes.push("This combination yields accurate results only if the resulting temperature is above 423&#8239;K.");
         if (newTemp < 423) {
-          currentNotes.push(`<span class="text-red-400">The temperature is currently ${newTemp.toFixed(1)}&nbsp;K.</span>`)
+          currentNotes.push(`<span class="text-red-400">The temperature is currently ${newTemp.toFixed(1)}&#8239;K.</span>`)
         }
         
         temp.value = newTemp;
