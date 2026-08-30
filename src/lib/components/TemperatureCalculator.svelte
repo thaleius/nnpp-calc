@@ -54,6 +54,8 @@
               fuelLevel = json.fuel;
             if (json.hasOwnProperty('fw'))
               feedwaterLevel = json.fw;
+            if (json.hasOwnProperty('temp500'))
+              tempBelow500 = json.temp500;
             if (json.hasOwnProperty('fwv'))
               feedwaterValves = json.fwv;
             if (json.hasOwnProperty('cv1'))
@@ -87,6 +89,7 @@
       cr: controlRodInsertion === 100 ? undefined : controlRodInsertion,
       fuel: fuelLevel === 100 ? undefined : fuelLevel,
       fw: feedwaterLevel === 100 ? undefined : feedwaterLevel,
+      temp500: tempBelow500 === false ? undefined : true,
       fwv: feedwaterValves === true ? undefined : false,
       cv1: coolantValves.alpha === true ? undefined : false,
       cv2: coolantValves.beta === true ? undefined : false,
