@@ -27,7 +27,8 @@
   let meltdown = $state(false);
   let scram = $state(false);
 
-  let baseHeating = $derived(fuelLevel === 0 ? -3 : 6);
+  let tempBelow500 = $state(false);
+  let baseHeating = $derived(fuelLevel === 0 ? -3 : tempBelow500 ? 5 : 6);
   let fuelHeating = $derived(20 * (fuelLevel < 75 ? fuelLevel / 100 : 1));
   let controlRodCooling = $derived(fuelLevel === 0 ? 0 : ((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * controlRodInsertion / 100));
   let feedwaterCooling = $derived((feedwaterValves ? 5 : 0) * (feedwaterLevel < 80 ? feedwaterLevel / 80 : 1));
@@ -143,6 +144,13 @@
   </div>
 
   <div class="flex flex-col gap-y-4 w-full md:w-70">
+    <div class="flex flex-col box w-full">
+      <div class="title">Temperature</div>
+      <div class="flex flex-col gap-y-2">
+        <Toggle bind:checked={tempBelow500} class="text-md cursor-pointer">Temperature lower than 500&#8239;K?</Toggle>
+      </div>
+    </div>
+
     <div class="flex flex-col box w-full">
       <div class="title">Coolants</div>
       <div class="flex flex-col gap-y-2">
