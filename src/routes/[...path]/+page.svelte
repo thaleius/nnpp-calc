@@ -1203,6 +1203,12 @@
           <TurbineSim temp={temp.value} bind:currentRpm={currentRpm} bind:currentFR={currentFR} bind:currentFRVState={frvState} targetRpm={targetRpm} bind:optimalSwitchTime={optimalSwitchTime} bind:currentSimTime={turbineSimCurrentSimTime} bind:valveEndTime={turbineSimValveEndTime} bind:isPlaying={turbineSimIsPlaying}  class="w-200 h-150" />
         </div>
         <div class="flex flex-col gap-y-4">
+          <div class="flex flex-col gap-y-2 bg-[#1e1e1e] box">
+            <div class="title">Instructions</div>
+            <div class="flex flex-col gap-y-2 w-64">
+              <p>To enter your desired temperature and RPM, click the input fields below and replace the values.</p>
+            </div>
+          </div>
           <div class="box flex flex-col">
             <div class="title">
               Animation
