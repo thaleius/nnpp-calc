@@ -1207,6 +1207,7 @@
             <div class="title">Instructions</div>
             <div class="flex flex-col gap-y-2 w-64">
               <p>To enter your desired temperature and RPM, click the input fields below and replace the values.</p>
+              <p>"Opt. Switch Time" is the time at which the flow rate valve should be set to <span class="text-nowrap">"--"</span>.</p>
             </div>
           </div>
           <div class="box flex flex-col">
