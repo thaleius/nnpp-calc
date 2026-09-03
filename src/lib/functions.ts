@@ -1,6 +1,6 @@
 import { getConstants } from "./api";
 
-const { C1, dC1, C2, dC2, C3, dC3, C4, dC4, C5, dC5, C6, dC6, C7, dC7 } = await getConstants();
+const { C1, dC1, C3, dC3, C4, dC4, C5, dC5, C6, dC6 } = await getConstants();
 const T0 = 323;
 const T1 = 370;
 const T2 = 423;
@@ -45,14 +45,14 @@ export function T_unc(FRV: number, dFRV: number, FR: number, dFR: number) {
 }
 
 export function pressure(T: number) {
-  return (T > T1 ? T > T2 ? (C1 * (T-T0)) : (C1*C2 * (T-T1)**2) : 0) + P0;
+  return (T > T1 ? T > T2 ? (C1 * (T-T0)) : (C1/28.09 * (T-T1)**2) : 0) + P0;
 }
 
 export function pressure_unc(T: number, dT: number) {
   return T > T1 ? T > T2 ? (
     ((T-T0)*dC1)**2 + (C1*dT)**2
   )**(1/2) * k : (
-    (T-T1)**4*((C2*dC1)**2 + (C1*dC2)**2) + (C1*C2*2*(T-T1)*dT)**2
+    (T-T1)**4*((dC1/28.09)**2) + (C1/28.09*2*(T-T1)*dT)**2
   )**(1/2) * k : 0
 }
 
