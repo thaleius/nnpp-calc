@@ -471,6 +471,8 @@
               temp.value = json.temp;
             if (json.excess)
               excess.value = json.excess;
+            if (json.lastFrv)
+              lastEdited = json.lastFrv;
             if (json.frv1)
               flowRateValve1.value = json.frv1;
             if (json.frv2)
@@ -607,6 +609,7 @@
     const json = {
       temp: temp.value === 423 ? undefined : temp.value,
       excess: excess.value === 0 ? undefined : excess.value,
+      lastFrv: lastEdited === 0 ? undefined : lastEdited,
       frv1: flowRateValve1.value === 0 ? undefined : flowRateValve1.value,
       frv2: flowRateValve2.value === 0 ? undefined : flowRateValve2.value,
       fr1: flowRate1.value === 0 ? undefined : flowRate1.value,
