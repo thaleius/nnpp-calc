@@ -52,6 +52,8 @@
     }
   };
 
+  let inputEl: HTMLInputElement;
+
   function handleInput(e: InputEvent) {
     if (onEdit) {
       onEdit(e);
@@ -59,22 +61,28 @@
   }
 </script>
 
-<div class="
-  flex justify-center items-center bg-[#0A0A0A] p-3 border border-neutral-800 text-[#aae28d] text-xl relative
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+  onclick={() => { if (edit) inputEl?.focus(); }}
+  class="
+  flex justify-center items-center bg-[#0A0A0A] p-3 border text-[#aae28d] text-xl relative transition-colors duration-200
+  {edit ? "border-orange-300 bg-orange-300/5 cursor-text" : "border-neutral-800"}
   {compact ? "flex-col" : "flex-row"}
   {wrapperClass}
 ">
   {#if compact}
-    <span class="text-xs uppercase tracking-wider text-neutral-400 text-center">{name}</span>
+    <span class="text-xs uppercase tracking-wider text-center transition-colors duration-200 {edit ? "text-orange-300 font-bold" : "text-neutral-400"}">{name}</span>
   {:else}
-    <span>{name}: </span>
+    <span class="transition-colors duration-200 {edit ? "text-orange-300 font-bold" : ""}">{name}: </span>
   {/if}
   <div>
     <span>{pre}</span>
     <input
+      bind:this={inputEl}
       type={type}
       bind:value={model.val} step={(1/10**decimals).toString()} min={min} max={max}
-      class="text-xl bg-transparent border-0 p-0 text-right {inputClass}"
+      class="text-xl bg-transparent border-0 p-0 text-right {edit ? "cursor-text" : "cursor-default pointer-events-none"} {inputClass}"
       oninput={handleInput} readonly={!edit}
     />
     <span>{unit}</span>

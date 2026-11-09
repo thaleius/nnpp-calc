@@ -405,6 +405,30 @@
     fwUtilEdit: FWUtil
   };
 
+  let activeEditIds = $derived(
+    Object.entries(checked)
+      .filter(([, isChecked]) => isChecked)
+      .map(([key]) => KEY_TO_ID[key as keyof typeof checked])
+  );
+
+  let combinableEditIds = $derived.by(() => {
+    if (activeEditIds.length === 0) return new Set<number>();
+    const matchingCombos = combinations.filter(combo =>
+      activeEditIds.every(id => combo.includes(id))
+    );
+    return new Set(
+      matchingCombos.flat().filter(id => !activeEditIds.includes(id))
+    );
+  });
+
+  function isCombinable(key: keyof typeof checked) {
+    return !checked[key] && combinableEditIds.has(KEY_TO_ID[key]);
+  }
+
+  function isDimmed(key: keyof typeof checked) {
+    return activeEditIds.length > 0 && !checked[key] && !combinableEditIds.has(KEY_TO_ID[key]);
+  }
+
   function updateSelection(changedKey: keyof typeof checked, newValue: boolean) {
     checked[changedKey] = newValue;
 
@@ -1034,13 +1058,13 @@
         <div class="flex flex-col bg-[#1e1e1e] box">
           <div class="title">Edit</div>
           <div class="flex flex-col gap-y-4 leading-none">
-            <Checkbox text="Temperature" bind:checked={checked.tempEdit} onchange={(e) => { handleModify(); updateSelection('tempEdit', e.currentTarget.checked); }} />
-            <Checkbox text="Excess" bind:checked={checked.excEdit} onchange={(e) => { handleModify(); updateSelection('excEdit', e.currentTarget.checked) }} />
-            <Checkbox text="Feedwater Demand" bind:checked={checked.fwFlowEdit} onchange={(e) => { handleModify(); updateSelection('fwFlowEdit', e.currentTarget.checked) }} />
-            <Checkbox text="Feedwater Util." bind:checked={checked.fwUtilEdit} onchange={(e) => { handleModify(); updateSelection('fwUtilEdit', e.currentTarget.checked) }} />
-            <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} onchange={(e) => { handleModify(); updateSelection('frvEdit', e.currentTarget.checked) }} />
-            <Checkbox text="Flow Rate" bind:checked={checked.frEdit} onchange={(e) => { handleModify(); updateSelection('frEdit', e.currentTarget.checked) }} />
-            <Checkbox text="Power Output" bind:checked={checked.outEdit} onchange={(e) => { handleModify(); updateSelection('outEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Temperature" bind:checked={checked.tempEdit} highlight={isCombinable('tempEdit')} dimmed={isDimmed('tempEdit')} onchange={(e) => { handleModify(); updateSelection('tempEdit', e.currentTarget.checked); }} />
+            <Checkbox text="Excess" bind:checked={checked.excEdit} highlight={isCombinable('excEdit')} dimmed={isDimmed('excEdit')} onchange={(e) => { handleModify(); updateSelection('excEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Feedwater Demand" bind:checked={checked.fwFlowEdit} highlight={isCombinable('fwFlowEdit')} dimmed={isDimmed('fwFlowEdit')} onchange={(e) => { handleModify(); updateSelection('fwFlowEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Feedwater Util." bind:checked={checked.fwUtilEdit} highlight={isCombinable('fwUtilEdit')} dimmed={isDimmed('fwUtilEdit')} onchange={(e) => { handleModify(); updateSelection('fwUtilEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Flow Rate Valve" bind:checked={checked.frvEdit} highlight={isCombinable('frvEdit')} dimmed={isDimmed('frvEdit')} onchange={(e) => { handleModify(); updateSelection('frvEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Flow Rate" bind:checked={checked.frEdit} highlight={isCombinable('frEdit')} dimmed={isDimmed('frEdit')} onchange={(e) => { handleModify(); updateSelection('frEdit', e.currentTarget.checked) }} />
+            <Checkbox text="Power Output" bind:checked={checked.outEdit} highlight={isCombinable('outEdit')} dimmed={isDimmed('outEdit')} onchange={(e) => { handleModify(); updateSelection('outEdit', e.currentTarget.checked) }} />
           </div>
         </div>
 
