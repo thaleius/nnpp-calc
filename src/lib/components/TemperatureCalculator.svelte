@@ -132,7 +132,7 @@
   </div>
 
   <div class="flex flex-col gap-y-1 box w-full md:w-70">
-    <Display name="Control Rod insertion" bind:value={controlRodInsertion} min={0} max={100} compact decimals={0} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
+    <Display name="Control Rod insertion" bind:value={controlRodInsertion} min={0} max={100} compact decimals={1} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
     <Display name="Fuel level" bind:value={fuelLevel} min={0} max={100} compact decimals={1} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
     <Display name="Feedwater level" bind:value={feedwaterLevel} min={0} max={100} compact decimals={1} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
     <Display name="Temperature Rate of Change"
