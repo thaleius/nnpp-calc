@@ -136,13 +136,13 @@
     <Display name="Fuel level" bind:value={fuelLevel} min={0} max={100} compact decimals={1} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
     <Display name="Feedwater level" bind:value={feedwaterLevel} min={0} max={100} compact decimals={1} edit={true} showUncertainty={false} unit="%" inputClass="w-12" />
     <Display name="Temperature Rate of Change"
-      bind:value={tempROC} min={baseHeating + fuelHeating - ((4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) + feedwaterCooling + coolantCooling)} max={44}
+      bind:value={tempROC} min={baseHeating + fuelHeating - ((4 + 16 * (fuelLevel <= 75 ? fuelLevel / 100 : 1)) + feedwaterCooling + coolantCooling)} max={44}
       compact decimals={2} edit={true} showUncertainty={false} unit="K/s" inputClass="w-18" onEdit={(e) => {
         if (fuelLevel === 0) {
           return
         }
         
-        controlRodInsertion = (baseHeating + fuelHeating - (tempROC + feedwaterCooling + coolantCooling + rvCooling)) / (4 + 16 * (fuelLevel < 75 ? fuelLevel / 100 : 1)) * 100
+        controlRodInsertion = (baseHeating + fuelHeating - (tempROC + feedwaterCooling + coolantCooling + rvCooling)) / (4 + 16 * (fuelLevel <= 75 ? fuelLevel / 100 : 1)) * 100
     }} />
   </div>
 
